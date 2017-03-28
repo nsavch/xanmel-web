@@ -1,0 +1,21 @@
+{% extends "map_rating/base.jinja" %}
+
+{% block content %}
+    <h1>Map rating for server {{ server_name }}</h1>
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>Map Name</th>
+            <th>Rating</th>
+            <th>Average vote</th>
+            <th>Total votes</th>
+        </tr>
+        {% for i in rating %}
+            <tr>
+            <td>{{ i.map }}</td>
+            <td>{{ i.rating }}</td>
+            <td>{{ i.average }}</td>
+            <td>{{ i.total }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
