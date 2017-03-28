@@ -1,0 +1,16 @@
+[Unit]
+Description=Xanmel-web UWSGI Server
+After=syslog.target
+
+[Service]
+ExecStart=/home/xanmel/venvs/xanmel-web/bin/uwsgi --ini /home/xanmel/xanmel-web/conf/uwsgi.ini
+User=xanmel
+Group=xanmel
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
