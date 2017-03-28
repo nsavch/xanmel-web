@@ -35,4 +35,5 @@ def restart_server():
 
 def deploy():
     update_app()
+    install_requirements()
     restart_server()
