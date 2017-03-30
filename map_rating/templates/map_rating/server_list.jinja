@@ -4,7 +4,7 @@
 <h1>Available servers</h1>
 <ul>
     {% for id, name in servers.items() %}
-    <li><a href="{{ url_for('map_rating.server_map_rating', server_id=id) }}">{{ name }}</a></li>
+    <li><a href="{{ url('map_rating:server_map_rating', id) }}">{{ name }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}
