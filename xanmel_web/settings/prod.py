@@ -1,5 +1,6 @@
 from .default import *
 
+ALLOWED_HOSTS = ['xon.teichisma.info']
 DEBUG = False
 TEMPLATE_DEBUG = False
 
