@@ -137,6 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
 with open('../xanmel/xanmel.yaml', 'r') as f:
     XANMEL_CONFIG = yaml.safe_load(f)
 
