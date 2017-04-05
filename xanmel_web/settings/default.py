@@ -61,8 +61,12 @@ TEMPLATES = [
     {
         'BACKEND': 'django_jinja.backend.Jinja2',
         'APP_DIRS': True,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'OPTIONS': {
             'match_extension': '.jinja',
+            'globals': {
+                'query_param': 'map_rating.jinja_helpers.query_param'
+            },
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
@@ -142,3 +146,7 @@ with open('../xanmel/xanmel.yaml', 'r') as f:
     XANMEL_CONFIG = yaml.safe_load(f)
 
 XONOTIC_SERVERS = XANMEL_CONFIG['modules']['xanmel.modules.xonotic.XonoticModule']['servers']
+
+XONOTIC_XDF_DATABASES = {
+    'exe.pub | Relaxed Running': '../../server.db.defrag'
+}

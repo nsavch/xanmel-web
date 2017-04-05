@@ -4,6 +4,5 @@ from .views import *
 
 
 urlpatterns = [
-    url('^$', server_list, name='server_list'),
-    url('^([^/]*)/map_rating$', server_map_rating, name='server_map_rating')
+    url('^$', map_rating_view, name='map_rating'),
 ]
