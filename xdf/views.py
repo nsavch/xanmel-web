@@ -35,13 +35,16 @@ def map_detail(request, server_id, map_id):
         map = Map.get(Map.server == server, Map.id == map_id)
     except DoesNotExist:
         raise Http404
-    speed_records = XDFSpeedRecord.select().where(XDFSpeedRecord.map == map)
+    try:
+        speed_record = XDFSpeedRecord.get(XDFSpeedRecord.map == map)
+    except DoesNotExist:
+        speed_record = None
     time_records = XDFTimeRecord.select().where(XDFTimeRecord.map == map).order_by(XDFTimeRecord.position)
     return render(request, 'xdf/map.jinja', {
         'active_menu': 'xdf',
         'active_server': server,
         'servers': servers,
         'map': map,
-        'speed_records': speed_records,
+        'speed_records': speed_record,
         'time_records': time_records
     })
