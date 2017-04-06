@@ -1,0 +1,1 @@
+*/5 * * * * xanmel cd /home/xanmel/xanmel-web && DJANGO_SETTINGS_MODULE=xanmel_web.settings.prod /home/xanmel/venvs/xanmel-web/bin/python manage.py update_server_db

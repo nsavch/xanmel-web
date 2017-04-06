@@ -33,6 +33,10 @@ def restart_server():
     run('systemctl restart xanmel-web')
 
 
+def update_cron():
+    put('conf/crontab', '/etc/cron.d/xanmel-web')
+    run('chmod 644 /etc/cron.d/xanmel-web')
+
 def deploy():
     update_app()
     install_requirements()
