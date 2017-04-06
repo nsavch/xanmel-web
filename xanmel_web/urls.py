@@ -17,5 +17,6 @@ from django.conf.urls import url, include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'', include('map_rating.urls', namespace='map_rating'))
+    url(r'', include('map_rating.urls', namespace='map_rating')),
+    url(r'xdf/', include('xdf.urls', namespace='xdf'))
 ]

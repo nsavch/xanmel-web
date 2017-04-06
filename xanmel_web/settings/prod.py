@@ -10,5 +10,5 @@ with open('/etc/xanmel.yaml', 'r') as f:
 XONOTIC_SERVERS = XANMEL_CONFIG['modules']['xanmel.modules.xonotic.XonoticModule']['servers']
 
 XONOTIC_XDF_DATABASES = {
-    'exe.pub | Relaxed Running': '/home/xonotic/.xonotic/data/data/server.db.defrag'
+    4: '/home/xonotic/.xonotic/data/data/server.db.defrag'
 }

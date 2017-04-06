@@ -2,26 +2,46 @@ from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
 
-from .server_db import ServerDB
+from xanmel.modules.xonotic.models import Server, DoesNotExist, XDFTimeRecord, Map, XDFSpeedRecord, JOIN
 
 
-def server_list(request):
-    return render('xdf/server_list.jinja', {'servers': settings.XONOTIC_XDF_DATABASES.keys()})
+def main_page(request):
+    servers = Server.select().where(Server.id << list(settings.XONOTIC_XDF_DATABASES.keys()))
+    if request.GET.get('server_id'):
+        try:
+            active_server = Server.get(id=request.GET['server_id'])
+        except DoesNotExist:
+            raise Http404
+    else:
+        active_server = servers[0]
+    map_summary = Map.select(Map, XDFTimeRecord, XDFSpeedRecord) \
+        .where(Map.server == active_server) \
+        .join(XDFTimeRecord, JOIN.LEFT_OUTER, on=XDFTimeRecord.map.alias('time_record')) \
+        .switch(Map) \
+        .join(XDFSpeedRecord, JOIN.LEFT_OUTER, on=XDFSpeedRecord.map.alias('speed_record')) \
+        .where(XDFTimeRecord.position == 1)
+    return render(request, 'xdf/main.jinja', {
+        'active_menu': 'xdf',
+        'servers': servers,
+        'active_server': active_server,
+        'map_summary': map_summary
+    })
 
 
-def map_list(request, server_name):
-    if server_name not in settings.XONOTIC_XDF_DATABASES:
+def map_detail(request, server_id, map_id):
+    servers = Server.select().where(Server.id << list(settings.XONOTIC_XDF_DATABASES.keys()))
+    try:
+        server = Server.get(id=server_id)
+        map = Map.get(Map.server == server, Map.id == map_id)
+    except DoesNotExist:
         raise Http404
-    with open(settings.XONOTIC_XDF_DATABASES[server_name], 'r') as f:
-        db = ServerDB.parse(f.read())
-    return render('xdf/map_list.jinja', {'maps': db.maps})
-
-
-def map_detail(request, server_name, map_name):
-    if server_name not in settings.XONOTIC_XDF_DATABASES:
-        raise Http404
-    with open(settings.XONOTIC_XDF_DATABASES[server_name], 'r') as f:
-        db = ServerDB.parse(f.read())
-    if map_name not in db.maps:
-        raise Http404
-    return render('xdf/map_detail.jinja', {'map_data': db.maps[map_name]})
+    speed_records = XDFSpeedRecord.select().where(XDFSpeedRecord.map == map)
+    time_records = XDFTimeRecord.select().where(XDFTimeRecord.map == map).order_by(XDFTimeRecord.position)
+    return render(request, 'xdf/map.jinja', {
+        'active_menu': 'xdf',
+        'active_server': server,
+        'servers': servers,
+        'map': map,
+        'speed_records': speed_records,
+        'time_records': time_records
+    })

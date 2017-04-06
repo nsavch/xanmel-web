@@ -13,32 +13,8 @@
         <div class="tab-pane active">
             <h3>&nbsp;</h3>
             <table id="data-table" class="table table-striped table-bordered">
-                <thead>
-                <tr>
-                    <th>Map Name</th>
-                    <th>Rating</th>
-                    <th>Average Vote</th>
-                    <th>Total Votes</th>
-                </tr>
-                </thead>
+
             </table>
-        {#
-            <table class="table table-bordered table-striped">
-                <tr>
-                    <th>Map Name <a href="?{{ query_param(request, 'sort', 'map|asc') }}"><i class="fa fa-sort"></i></a></th>
-                    <th>Rating <a href="?{{ query_param(request, 'sort', 'rating|asc') }}"><i class="fa fa-sort"></i></a></th>
-                    <th>Average vote <a href="?{{ query_param(request, 'sort', 'average|asc') }}"><i class="fa fa-sort"></i></a></th>
-                    <th>Total votes <a href="?{{ query_param(request, 'sort', 'total|asc') }}"><i class="fa fa-sort"></i></a></th>
-                </tr>
-                {% for i in rating %}
-                    <tr>
-                        <td>{{ i.map.name }}</td>
-                        <td>{{ i.rating }}</td>
-                        <td>{{ i.average|floatformat(2) }}</td>
-                        <td>{{ i.total }}</td>
-                    </tr>
-                {% endfor %}
-            </table> #}
         </div>
     </div>
 {% endblock %}
@@ -50,11 +26,18 @@
             ['{{ i.map.name }}', {{ i.rating }}, {{ i.average | floatformat(2) }}, {{ i.total }}],
         {% endfor %}
     ];
-    console.log(data);
     $('#data-table').DataTable({
         data: data,
         columns: [{title: 'Map Name'}, {title: 'Rating'}, {title: 'Average Vote'}, {title: 'Total Votes'}],
-        order: [[ 2, 'desc' ], [1, 'desc']]
+        order: [[ 2, 'desc' ], [1, 'desc']] /*,
+           columnDefs: [
+            {
+                "render": function ( data, type, row ) {
+                    return '<a href="#">' + data + '</a>';
+                },
+                "targets": 0
+            }
+        ] */
     })
     </script>
 {% endblock %}
