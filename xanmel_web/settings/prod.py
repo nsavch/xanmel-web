@@ -1,6 +1,6 @@
 from .default import *
 
-ALLOWED_HOSTS = ['xon.teichisma.info']
+ALLOWED_HOSTS = ['xon.teichisma.info', 'portal.exe.pub']
 DEBUG = False
 TEMPLATE_DEBUG = False
 
