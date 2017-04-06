@@ -45,6 +45,6 @@ def map_detail(request, server_id, map_id):
         'active_server': server,
         'servers': servers,
         'map': map,
-        'speed_records': speed_record,
+        'speed_record': speed_record,
         'time_records': time_records
     })
