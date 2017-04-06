@@ -28,6 +28,7 @@
     ];
     $('#data-table').DataTable({
         data: data,
+        lengthMenu: [100,150,200,250,300],
         columns: [{title: 'Map Name'}, {title: 'Rating'}, {title: 'Average Vote'}, {title: 'Total Votes'}],
         order: [[ 2, 'desc' ], [1, 'desc']] /*,
            columnDefs: [
