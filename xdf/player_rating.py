@@ -10,17 +10,20 @@ ITERATION_CORRECTION_FUN = lambda n: 2**(-n)
 
 
 class PlayerRating:
-    def __init__(self, server_id):
+    def __init__(self, server_id, only_for_map=None):
         self.server_id = server_id
         self.map_times = defaultdict(list)
         self.map_rating_iterations = []
         self.total_rating_iterations = []
+        self.only_for_map = only_for_map
         self.load_times()
         self.initial()
         self.current_iteration_number = 1
 
     def load_times(self):
         records = XDFTimeRecord.select().join(Map).order_by(XDFTimeRecord.position)
+        if self.only_for_map:
+            records = records.where(Map.id == self.only_for_map)
         for record in records:
             self.map_times[record.map].append(record)
 
@@ -56,8 +59,8 @@ class PlayerRating:
             if has_some:
                 total_rating[player] = rating / len(map_rating[player])
         self.__normalize(total_rating)
-        for player, rating in sorted(total_rating.items(), key=lambda x: x[1], reverse=True):
-            print(player.nickname, rating)
+        # for player, rating in sorted(total_rating.items(), key=lambda x: x[1], reverse=True):
+        #     print(player.nickname, rating)
         self.total_rating_iterations = [total_rating]
 
     def next(self):
@@ -95,7 +98,7 @@ class PlayerRating:
             if has_some:
                 total_rating[player] = rating / len(map_rating[player])
         self.__normalize(total_rating)
-        for player, rating in sorted(total_rating.items(), key=lambda x: x[1], reverse=True):
-            print(player.nickname, rating, rating - self.total_rating_iterations[-1].get(player, NORMALIZE_BOUNDS[0]))
+        # for player, rating in sorted(total_rating.items(), key=lambda x: x[1], reverse=True):
+        #     print(player.nickname, rating, rating - self.total_rating_iterations[-1].get(player, NORMALIZE_BOUNDS[0]))
         self.total_rating_iterations.append(total_rating)
         self.current_iteration_number += 1

@@ -4,6 +4,8 @@ from django.conf import settings
 
 from xanmel.modules.xonotic.models import Server, DoesNotExist, XDFTimeRecord, Map, XDFSpeedRecord, JOIN
 
+from .player_rating import PlayerRating
+
 
 def main_page(request):
     servers = Server.select().where(Server.id << list(settings.XONOTIC_XDF_DATABASES.keys()))
@@ -40,11 +42,27 @@ def map_detail(request, server_id, map_id):
     except DoesNotExist:
         speed_record = None
     time_records = XDFTimeRecord.select().where(XDFTimeRecord.map == map).order_by(XDFTimeRecord.position)
+    rating = PlayerRating(server.id, only_for_map=map.id)
     return render(request, 'xdf/map.jinja', {
         'active_menu': 'xdf',
         'active_server': server,
         'servers': servers,
         'map': map,
         'speed_record': speed_record,
-        'time_records': time_records
+        'time_records': time_records,
+        'rating': rating.map_rating_iterations[-1]
+    })
+
+
+def main_rating(request, server_id):
+    servers = Server.select().where(Server.id << list(settings.XONOTIC_XDF_DATABASES.keys()))
+    try:
+        server = Server.get(id=server_id)
+    except DoesNotExist:
+        raise Http404
+    rating = PlayerRating(server.id).total_rating_iterations[-1]
+    return render(request, 'xdf/main_rating.jinja', {
+        'servers': servers,
+        'active_server': server,
+        'rating': sorted(rating.items(), key=lambda x: x[1], reverse=True)
     })
