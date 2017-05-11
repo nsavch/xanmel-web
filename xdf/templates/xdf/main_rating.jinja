@@ -14,11 +14,13 @@
             <h2>Aggregated Defrag Rating:</h2>
             <table class="table table-bordered">
                 <tr>
+                    <th>#</th>
                     <th>Player</th>
                     <th>Rating</th>
                 </tr>
                 {% for player, score in rating %}
                     <tr>
+                    <td>{{ loop.index }}</td>
                     <td>{{ player.nickname }}</td>
                     <td>{{ score|floatformat(2) }}</td>
                     </tr>
