@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
 
-from xanmel.modules.xonotic.models import Server, DoesNotExist, XDFTimeRecord, Map, XDFSpeedRecord, JOIN
+from xanmel.modules.xonotic.models import Server, DoesNotExist, XDFTimeRecord, Map, XDFSpeedRecord, JOIN, Player
 
 from .player_rating import PlayerRating
 
@@ -65,4 +65,55 @@ def main_rating(request, server_id):
         'servers': servers,
         'active_server': server,
         'rating': sorted(rating.items(), key=lambda x: x[1], reverse=True)
+    })
+
+
+def comparison(request, server_id):
+    servers = Server.select().where(Server.id << list(settings.XONOTIC_XDF_DATABASES.keys()))
+    try:
+        server = Server.get(id=server_id)
+    except DoesNotExist:
+        raise Http404
+    player1_id = request.GET.get('player1')
+    player2_id = request.GET.get('player2')
+    players = Player.select().order_by(Player.nickname)
+    if player1_id is None or player2_id is None:
+        return render(request, 'xdf/comparison.jinja', {
+            'servers': servers,
+            'active_server': server,
+            'players': players,
+            'results': []
+        })
+    try:
+        player1 = Player.get(id=player1_id)
+        player2 = Player.get(id=player2_id)
+    except DoesNotExist:
+        raise Http404
+    results = []
+    maps = Map.select(Map).where(Map.server == server)
+    for i in maps:
+        try:
+            p1r = XDFTimeRecord.get(XDFTimeRecord.map == i, XDFTimeRecord.player == player1)
+        except DoesNotExist:
+            p1r = None
+        try:
+            p2r = XDFTimeRecord.get(XDFTimeRecord.map == i, XDFTimeRecord.player == player2)
+        except DoesNotExist:
+            p2r = None
+        if p1r or p2r:
+            if p1r and p2r:
+                if p1r.time < p2r.time:
+                    gap = (p2r.time - p1r.time) * 100 / p1r.time
+                else:
+                    gap = (p1r.time - p2r.time) * 100 / p2r.time
+                results.append((i, p1r, p2r, gap))
+            else:
+                gap = None
+    return render(request, 'xdf/comparison.jinja', {
+        'servers': servers,
+        'active_server': server,
+        'player1': player1,
+        'player2': player2,
+        'players': players,
+        'results': results
     })

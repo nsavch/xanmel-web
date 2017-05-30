@@ -1,0 +1,79 @@
+{% extends "base.jinja" %}
+
+{% block content %}
+    <h1>Racing records</h1>
+    <ul class="nav nav-tabs">
+        {% for i in servers %}
+            <li {% if i.id == active_server.id %}class="active"{% endif %}>
+                <a href="{{ url('xdf:main') }}?server_id={{ i.id }}">{{ i.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <div class="tab-content">
+    <form method="get">
+        <div class="form-group">
+            <label for="player1">Player 1</label>
+            <select id="player1" class="form-control" name="player1">
+                {% for player in players %}
+                    <option value="{{ player.id }}" {% if player1 and player1.id == player.id %}selected{% endif %}>{{ player.nickname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="player2">Player 2</label>
+            <select id="player1" class="form-control" name="player2">
+                {% for player in players %}
+                    <option value="{{ player.id }}" {% if player2 and player2.id == player.id %}selected{% endif %}>{{ player.nickname }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-default">Compare</button>
+
+    </form>
+    {% if results %}
+    <table class="table table-bordered">
+    <tr>
+        <th>
+            map
+        </th>
+        <th>
+            {{ player1.nickname }}
+        </th>
+        <th>
+            {{ player2.nickname }}
+        </th>
+        <th>
+
+        </th>
+    </tr>
+        {% for map, p1r, p2r, gap in results %}
+            <tr>
+            <td>{{ map.name }}</td>
+            <td>{{ p1r and p1r.time / 100 }}</td>
+            <td>{{ p2r and p2r.time / 100}}</td>
+            <td style="min-width: 300px">
+            <div class="progress">
+                {% if not p1r %}
+                    <div class="progress-bar progress-bar-danger" role="progressbar" style="width: 100%"></div>
+                {% elif not p2r %}
+                    <div class="progress-bar progress-bar-success" role="progressbar" style="width: 100%"></div>
+                {% else %}
+                    {% if p1r.time < p2r.time %}
+                        <div class="progress-bar progress-bar-success" role="progressbar" style="width: {{ gap | floatformat(0)}}%; min-width: 2em;">
+                        {{ gap|floatformat(0) }}%
+                        </div>
+                    {% else %}
+                        <div class="progress-bar progress-bar-danger" role="progressbar" style="width: {{ gap | floatformat(0)}}%; min-width: 2em;">
+                        {{ gap|floatformat(0) }}%
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            </td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    </div>
+{% endblock %}
