@@ -1,6 +1,7 @@
 from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
+from peewee import fn
 
 from xanmel.modules.xonotic.models import Server, DoesNotExist, XDFTimeRecord, Map, XDFSpeedRecord, JOIN, Player
 
@@ -76,7 +77,7 @@ def comparison(request, server_id):
         raise Http404
     player1_id = request.GET.get('player1')
     player2_id = request.GET.get('player2')
-    players = Player.select().order_by(Player.nickname)
+    players = Player.select(fn.Distinct(Player.id), Player.nickname).join(XDFTimeRecord).switch(Player).order_by(Player.nickname)
     if player1_id is None or player2_id is None:
         return render(request, 'xdf/comparison.jinja', {
             'servers': servers,
