@@ -54,8 +54,8 @@
         {% for map, p1r, p2r, gap in results %}
             <tr>
             <td>{{ map.name }}</td>
-            <td>{{ p1r and p1r.time / 100 }}</td>
-            <td>{{ p2r and p2r.time / 100}}</td>
+            <td>#{{ p1r.position }} &mdash; {{ p1r and p1r.time / 100 }}</td>
+            <td>#{{ p2r.position }} &mdash; {{ p2r and p2r.time / 100 }}</td>
             <td style="min-width: 300px">
             <div class="progress">
                 {% if not p1r %}
