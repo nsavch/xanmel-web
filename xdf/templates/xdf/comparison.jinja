@@ -31,6 +31,11 @@
 
     </form>
     {% if results %}
+        <ul>
+        <li>{{ player1.nickname }} is better on <strong>{{ summary['p1_better'] }}</strong> maps</li>
+        <li>{{ player2.nickname }} is better on <strong>{{ summary['p2_better'] }}</strong> maps</li>
+        <li>Total gap is <strong>{{ summary['total_gap']|floatformat(0) }}%</strong></li>
+        </ul>
     <table class="table table-bordered">
     <tr>
         <th>

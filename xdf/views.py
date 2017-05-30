@@ -91,6 +91,11 @@ def comparison(request, server_id):
         raise Http404
     results = []
     maps = Map.select(Map).where(Map.server == server)
+    summary = {
+        'p1_better': 0,
+        'p2_better': 0,
+        'total_gap': 0
+    }
     for i in maps:
         try:
             p1r = XDFTimeRecord.get(XDFTimeRecord.map == i, XDFTimeRecord.player == player1)
@@ -103,9 +108,13 @@ def comparison(request, server_id):
         if p1r or p2r:
             if p1r and p2r:
                 if p1r.time < p2r.time:
+                    summary['p1_better'] += 1
                     gap = (p2r.time - p1r.time) * 100 / p1r.time
+                    summary['total_gap'] += gap
                 else:
+                    summary['p2_better'] += 1
                     gap = (p1r.time - p2r.time) * 100 / p2r.time
+                    summary['total_gap'] -= gap
                 results.append((i, p1r, p2r, gap))
             else:
                 gap = None
@@ -115,5 +124,6 @@ def comparison(request, server_id):
         'player1': player1,
         'player2': player2,
         'players': players,
-        'results': results
+        'results': results,
+        'summary': summary
     })
