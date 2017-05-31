@@ -91,7 +91,7 @@ def comparison(request, server_id):
     except DoesNotExist:
         raise Http404
     results = []
-    maps = Map.select(Map).where(Map.server == server)
+    maps = Map.select(Map).where(Map.server == server).order_by(Map.name)
     summary = {
         'p1_better': 0,
         'p2_better': 0,
