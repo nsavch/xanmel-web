@@ -53,7 +53,7 @@
     </tr>
         {% for map, p1r, p2r, gap in results %}
             <tr>
-                <td><a href="{{ url('map_detail', active_server.id, map.id) }}">{{ map.name }}</a></td>
+                <td><a href="{{ url('xdf:map_detail', active_server.id, map.id) }}">{{ map.name }}</a></td>
             <td>#{{ p1r.position }} &mdash; {{ p1r and p1r.time / 100 }}</td>
             <td>#{{ p2r.position }} &mdash; {{ p2r and p2r.time / 100 }}</td>
             <td style="min-width: 300px">
