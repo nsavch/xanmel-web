@@ -20,7 +20,7 @@
         <div class="col-md-6">
             <h2>Analyze identity</h2>
             <a href="{{ url('sorm:identity-list') }}">Back to SORM index</a>
-            <h3>Analyzing {{ identity.nickname }}<br><small>@{{ identity.server.name }}/{{ identity.timestamp }}</small></h3>
+            <h3>Analyzing {{ identity.nickname }}<br><small>{{ identity.server.name }}@{{ identity.timestamp }}</small></h3>
             <table class="table">
 
                 <tr>
