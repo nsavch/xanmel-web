@@ -1,0 +1,122 @@
+{% extends "base.jinja" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <style>
+    #map {
+        height: 400px;
+    }
+    td.search {
+        /*font-size: 150%;
+        padding-top: 4px !important; */
+    }
+    </style>
+{% endblock %}
+
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-6">
+            <h2>Analyze identity</h2>
+            <a href="{{ url('sorm:identity-list') }}">Back to SORM index</a>
+            <h3>Analyzing {{ identity.nickname }}</h3>
+            <table class="table">
+
+                <tr>
+                    <th>Crypto IDFP</th>
+                    <td>{{ identity.crypto_idfp }}</td>
+                    <td class="search"><a class="btn btn-primary" href="?search=crypto_idfp"><i
+                            class="fa fa-search"></i></a></td>
+                </tr>
+                <tr>
+                    <th>Xonstats</th>
+                    <td>
+                        {% if identity.stats_id %}
+                            <a href="http://stats.xonotic.org/player/{{ identity.stats_id }}">{{ identity.stats_id }}</a>
+                        {% endif %}
+                    </td>
+                    <td class="search"><a class="btn btn-primary" href="?search=stats_id"><i
+                            class="fa fa-search"></i></a></td>
+                </tr>
+                <tr>
+                    <th>IP</th>
+                    <td>{{ identity.ip_address }}</td>
+                    <td class="search"><a class="btn btn-primary" href="?search=ip_address"><i class="fa fa-search"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Geolocation</th>
+                    <td>{{ identity.to_key().full_geoloc() }}</td>
+                    <td class="search"><a class="btn btn-primary" href="?search=geoloc"><i class="fa fa-search"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>ASN</th>
+                    <td>{{ identity.asn }}: {{ identity.asn_cidr }} ({{ identity.asn_country_code }})</td>
+                    <td class="search"><a class="btn btn-primary" href="?search=asn"><i class="fa fa-search"></i></a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Network</th>
+                    <td>{{ identity.network_name }}: {{ identity.network_cidr }} ({{ identity.network_country_code }})
+                    </td>
+                    <td class="search"><a class="btn btn-primary" href="?search=network"><i
+                            class="fa fa-search"></i></a></td>
+                </tr>
+            </table>
+            {% if identities %}
+                <h3>Search results</h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Nickname</th>
+                        <th>Geoloc</th>
+                        <th>Network name</th>
+                        <th><abbr title="Games played">GP</abbr></th>
+                    </tr>
+                    {% for key, value in identities %}
+                        <tr>
+                            <td>
+                                <a href="{{ url('sorm:identity-details', value['id']) }}">{{ value['nickname'] }}</a>
+                            </td>
+                            <td>
+                                {{ key.full_geoloc() }}
+                            </td>
+                            <td>
+                                {{ key.get('network_name') }}
+                            </td>
+                            <td>{{ value.timestamps|length }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+
+        </div>
+        <div class="col-md-6">
+            <div class="pull-right" style="margin-top: 20px;">Hello, {{ user.username }}! <a href="{{ url('logout') }}">Log
+                OUT</a></div>
+            <h3>Map</h3>
+            <div id="map">
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 1);
+        L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        {% if identity.latitude %}
+            L.marker([{{ identity.latitude }}, {{ identity.longitude }}], {color: 'red'}).bindPopup('{{ identity.nickname }}: {{ identity.to_key().full_geoloc() }}').addTo(map);
+        {% endif %}
+    {% for key, value in identities %}
+            {% for latitude, longitude in value.geo %}
+                L.marker([{{ latitude }}, {{ longitude }}], {riseOnHover: true}).addTo(map).bindPopup('{{ value['nickname'] }}: {{ key.full_geoloc() }}');
+            {% endfor %}
+        {% endfor %}
+
+    </script>
+{% endblock %}

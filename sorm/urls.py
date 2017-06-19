@@ -1,7 +1,8 @@
 from django.conf.urls import url
 
-from sorm.views import identity_list
+from sorm.views import identity_list, identity_details
 
 urlpatterns = [
-    url(r'$', identity_list, name='identity_list'),
+    url(r'(\d+)/$', identity_details, name='identity-details'),
+    url(r'$', identity_list, name='identity-list'),
 ]
