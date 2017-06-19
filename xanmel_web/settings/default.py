@@ -40,9 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_jinja',
+    'djangobower',
     'map_rating',
     'xdf',
-    'xanmel_db'
+    'xanmel_db',
+    'sorm'
 ]
 
 MIDDLEWARE = [
@@ -143,6 +145,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder']
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'bower_components')
 
 with open('../xanmel/xanmel.yaml', 'r') as f:
     XANMEL_CONFIG = yaml.safe_load(f)

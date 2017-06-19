@@ -14,9 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
-from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     url(r'', include('map_rating.urls', namespace='map_rating')),
-    url(r'xdf/', include('xdf.urls', namespace='xdf'))
+    url(r'xdf/', include('xdf.urls', namespace='xdf')),
+    url(r'sorm/', include('sorm.urls', namespace='sorm')),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.jinja')),
+    url(r'^accounts/logout/$', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+
 ]
