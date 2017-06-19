@@ -82,6 +82,9 @@ def identity_details(request, identity_id):
         elif search == 'stats_id':
             raw_identities = PlayerIdentification.select().where(
                 PlayerIdentification.stats_id == identity.stats_id)
+        elif search == 'raw_nickname':
+            raw_identities = PlayerIdentification.select().where(
+                PlayerIdentification.raw_nickname == identity.raw_nickname)
         elif search == 'ip_address':
             raw_identities = PlayerIdentification.select().where(
                 PlayerIdentification.ip_address == identity.ip_address)
