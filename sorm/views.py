@@ -49,12 +49,16 @@ def identity_list(request):
     # noinspection PyTypeChecker
     raw_identities = PlayerIdentification.select()\
         .join(Server)\
-        .where(start_date < PlayerIdentification.timestamp < end_date)
+        .where((PlayerIdentification.timestamp > start_date) & (PlayerIdentification.timestamp < end_date))
+    print(raw_identities)
     identities = IdentityList()
     for i in raw_identities:
         identities.add_identity(i)
     return render(request, 'sorm/identity_list.jinja', {
-        'identities': identities
+        'identities': identities,
+        'start_date': start_date,
+        'end_date': end_date,
+        'prev_date': start_date - datetime.timedelta(hours=24)
     })
 
 

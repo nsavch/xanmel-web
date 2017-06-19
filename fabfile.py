@@ -17,6 +17,9 @@ def update_app():
 def install_requirements():
     with cd(app_path):
         sudo('HOME=%s %s/bin/pip install -r requirements.txt' % (local_home, venv_path), user=local_user)
+    with cd('/home/xanmel/xanmel'):
+        sudo('HOME=%s git pull' % local_home)
+        sudo('HOME=%s %s/bin/python setup.py install' % (local_home, venv_path), user=local_user)
 
 
 def update_systemd():
@@ -36,6 +39,7 @@ def restart_server():
 def update_cron():
     put('conf/crontab', '/etc/cron.d/xanmel-web')
     run('chmod 644 /etc/cron.d/xanmel-web')
+
 
 def deploy():
     update_app()
