@@ -116,14 +116,22 @@
         L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
+        var markers = [];
+        var marker;
         {% if identity.latitude %}
-            L.marker([{{ identity.latitude }}, {{ identity.longitude }}], {color: 'red'}).bindPopup('{{ identity.nickname }}: {{ identity.to_key().full_geoloc() }}').addTo(map);
+            marker = L.marker([{{ identity.latitude }}, {{ identity.longitude }}], {color: 'red'});
+            markers.push(marker);
+            marker.bindPopup('{{ identity.nickname }}: {{ identity.to_key().full_geoloc() }}').addTo(map);
         {% endif %}
     {% for key, value in identities %}
             {% for latitude, longitude in value.geo %}
-                L.marker([{{ latitude }}, {{ longitude }}], {riseOnHover: true}).addTo(map).bindPopup('{{ value['nickname'] }}: {{ key.full_geoloc() }}');
+                marker = L.marker([{{ latitude }}, {{ longitude }}], {riseOnHover: true});
+                markers.push(marker);
+                marker.addTo(map).bindPopup('{{ value['nickname'] }}: {{ key.full_geoloc() }}');
             {% endfor %}
         {% endfor %}
+    var group = new L.featureGroup(markers);
+        map.fitBounds(group.getBounds(), {maxZoom: 5});
 
     </script>
 {% endblock %}
