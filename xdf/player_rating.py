@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from xanmel.modules.xonotic.models import *
 
-MAX_POS = 15
+MAX_POS = 30
 POS_CORRECTION_FUN = lambda n: (MAX_POS - n) ** 2
 NUM_SKIP_BAD_MAPS = 3
 NORMALIZE_BOUNDS = (100, 1000)
