@@ -38,7 +38,7 @@ class ServerDB:
             position = int(match.group(2))
             inst.maps[map_name]['speed'] = defaultdict(dict)
             if time > 0:
-                inst.maps[map_name][position] = {'time': time}
+                inst.maps[map_name][position] = {'time': int(time)}
         for k, crypto_idfp in cls.db.filter(speed_id_re, is_regex=True):
             match = speed_id_re.match(k)
             map_name = match.group(1)
