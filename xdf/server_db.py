@@ -32,7 +32,8 @@ class ServerDB:
         position_re = re.compile('(.*)/cts100record/crypto_idfp(\d+)')
         speed_id_re = re.compile('(.*)/cts100record/speed/crypto_idfp')
         speed_value_re = re.compile('(.*)/cts100record/speed/speed')
-        for k, time in cls.db.filter(time_re, is_regex=True):
+        for k, v in cls.db.filter(time_re, is_regex=True):
+            time = int(v)
             match = time_re.match(k)
             map_name = match.group(1)
             position = int(match.group(2))
@@ -51,7 +52,7 @@ class ServerDB:
             if map_name not in inst.maps:
                 continue
             inst.maps[map_name]['speed']['speed'] = float(v)
-        for k, v in cls.db.filter(position_re):
+        for k, v in cls.db.filter(position_re, is_regex=True):
             match = position_re.match(k)
             map_name = match.group(1)
             pos = int(match.group(2))
