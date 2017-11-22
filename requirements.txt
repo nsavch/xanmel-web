@@ -36,9 +36,10 @@ simplegeneric==0.8.1
 simplex==0.1.2
 six==1.10.0
 traitlets==4.3.2
-uWSGI==2.0.14
+uWSGI==2.0.15
 wcwidth==0.1.7
 #xanmel==0.2a1
 yarl==0.9.8
 django-bower==5.2.0
 python-dateutil==2.6.0
+# python-xonotic-db==0.3.0

@@ -5,6 +5,7 @@ from urllib.parse import unquote
 
 from django.conf import settings
 
+from xon_db import XonoticDB
 from xanmel.modules.xonotic.models import *
 
 logger = logging.getLogger(__name__)
@@ -13,7 +14,9 @@ logger = logging.getLogger(__name__)
 class ServerDB:
     def __init__(self):
         self.maps = defaultdict(dict)
-        self.uid_to_name = dict()
+
+    def uid_to_name(self, crypto_idfp):
+        return self.db.get('/uid2name/' + crypto_idfp, 'Unregistered player')
 
     @classmethod
     def parse_server(cls, server_id):
@@ -24,38 +27,38 @@ class ServerDB:
     @classmethod
     def parse(cls, data):
         inst = cls()
-        time_re = re.compile(
-            r'\\(?P<map_name>[\w-]+)/cts100record/time(?P<position>\d+)\\(?P<time>\d+)')
-        speed_player_re = re.compile(
-            r'\\(?P<map_name>[\w-]+)/cts100record/speed/crypto_idfp\\(?P<crypto_idfp>[a-zA-Z0-9_%]+)')
-        speed_speed_re = re.compile(
-            r'\\(?P<map_name>[\w-]+)/cts100record/speed/speed\\(?P<speed>[\d.]+)')
-        record_re = re.compile(
-            r'\\(?P<map_name>[\w-]+)/cts100record/crypto_idfp(?P<position>\d+)\\(?P<crypto_idfp>[a-zA-Z0-9_%]+)')
-        uid_to_name_re = re.compile(
-            r'\\/uid2name/(?P<crypto_idfp>[\w+/=]+)\\(?P<nickname>.*)'
-        )
-        for i in time_re.finditer(data):
-            time = int(i.group('time'))
-            inst.maps[i.group('map_name')]['speed'] = defaultdict(dict)
+        cls.db = XonoticDB(data)
+        time_re = re.compile('(.*)/cts100record/time(\d+)')
+        position_re = re.compile('(.*)/cts100record/crypto_idfp(\d+)')
+        speed_id_re = re.compile('(.*)/cts100record/speed/crypto_idfp')
+        speed_value_re = re.compile('(.*)/cts100record/speed/speed')
+        for k, time in cls.db.filter(time_re, is_regex=True):
+            match = time_re.match(k)
+            map_name = match.group(1)
+            position = int(match.group(2))
+            inst.maps[map_name]['speed'] = defaultdict(dict)
             if time > 0:
-                inst.maps[i.group('map_name')][int(i.group('position'))] = {'time': time}
-        for i in speed_player_re.finditer(data):
-            if not i.group('map_name') in inst.maps:
+                inst.maps[map_name][position] = {'time': time}
+        for k, crypto_idfp in cls.db.filter(speed_id_re, is_regex=True):
+            match = speed_id_re.match(k)
+            map_name = match.group(1)
+            if map_name not in inst.maps:
                 continue
-            inst.maps[i.group('map_name')]['speed']['player'] = unquote(i.group('crypto_idfp'))
-        for i in speed_speed_re.finditer(data):
-            if not i.group('map_name') in inst.maps:
+            inst.maps[map_name]['speed']['player'] = crypto_idfp
+        for k, v in cls.db.filter(speed_value_re, is_regex=True):
+            match = speed_value_re.match(k)
+            map_name = match.group(1)
+            if map_name not in inst.maps:
                 continue
-            inst.maps[i.group('map_name')]['speed']['speed'] = float(i.group('speed'))
-        for i in record_re.finditer(data):
-            pos = int(i.group('position'))
-            if pos not in inst.maps[i.group('map_name')]:
-                logger.warning('I have player id for position %s on %s but no time!', pos, i.group('map_name'))
+            inst.maps[map_name]['speed']['speed'] = float(v)
+        for k, v in cls.db.filter(position_re):
+            match = position_re.match(k)
+            map_name = match.group(1)
+            pos = int(match.group(2))
+            if pos not in inst.maps[map_name]:
+                logger.warning('I have player id for position %s on %s but no time!', pos, map_name)
                 continue
-            inst.maps[i.group('map_name')][pos]['player'] = unquote(i.group('crypto_idfp'))
-        for i in uid_to_name_re.finditer(data):
-            inst.uid_to_name[i.group('crypto_idfp')] = unquote(i.group('nickname'))
+            inst.maps[map_name][pos]['player'] = v
         return inst
 
     def save(self, server_id):
@@ -66,7 +69,7 @@ class ServerDB:
             for k, v in item.items():
                 player = Player.from_cryptoidfp(v['player'], settings.XONOTIC_ELO_REQUEST_SIGNATURE)
                 if player is None:
-                    raw_nickname = self.uid_to_name.get(v['player'], 'Unregistered player')
+                    raw_nickname = self.uid_to_name(v['player'])
                     player = Player.create(crypto_idfp=v['player'], raw_nickname=raw_nickname,
                                            nickname=Color.dp_to_none(raw_nickname.encode('utf8')).decode('utf8'))
                 if k == 'speed':
