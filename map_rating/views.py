@@ -32,6 +32,6 @@ def map_rating_view(request):
 def cointoss_logs(request):
     logs = {}
     for srv in settings.COINTOSS_SERVERS:
-        with os.path.join(settings.COINTOSS_LOG_DIR, srv) as f:
+        with open(os.path.join(settings.COINTOSS_LOG_DIR, srv)) as f:
             logs[srv] = f.read()
     return render(request, 'map_rating/cointoss_logs.jinja', {'logs': logs})
