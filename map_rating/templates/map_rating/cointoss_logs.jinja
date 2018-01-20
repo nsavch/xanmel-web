@@ -11,7 +11,9 @@
 <div class="tab-content">
     {% for srv_name, log in logs.items() %}
         <div role="tabpanel" class="tab-pane {% if loop.first %}active{% endif %}" id="{{ srv_name }}">
+        <pre>
             {{ log }}
+        </pre>
         </div>
     {% endfor %}
 </div>
