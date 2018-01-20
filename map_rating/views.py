@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
 from xanmel.modules.xonotic.models import *
@@ -25,3 +27,11 @@ def map_rating_view(request):
         'active_server': active_server,
         'rating': rating
     })
+
+
+def cointoss_logs(request):
+    logs = {}
+    for srv in settings.COINTOSS_SERVERS:
+        with os.path.join(settings.COINTOSS_LOG_DIR, srv) as f:
+            logs[srv] = f.read()
+    return render(request, 'map_rating/cointoss_logs.jinja', {'logs': logs})

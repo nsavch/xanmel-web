@@ -158,3 +158,6 @@ XONOTIC_ELO_REQUEST_SIGNATURE = 'gQEBTrBWi2M7i5cInTMatx0iHAxmN4Xta2NZdXD2OsFls/x
 XONOTIC_XDF_DATABASES = {
     4: '../../server.db.defrag'
 }
+
+COINTOSS_SERVERS = ['t1', 't2', 't3', 't4']
+COINTOSS_LOG_DIR = '/home/xanmel/cointoss-logs'

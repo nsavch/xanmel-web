@@ -1,0 +1,18 @@
+{% extends "base.jinja" %}
+
+{% block content %}
+<ul class="nav nav-tabs" role="tablist">
+    {% for srv_name in logs.keys() %}
+        <li role="presentation" {% if loop.first %}class="active"{% endfor %}>
+        <a href="#{{ srv_name }}" aria-controls="{{ srv_name }}" role="tab" data-toggle="tab">{{ srv_name|upper }}</a>
+    </li>
+    {% endfor %}
+</ul>
+<div class="tab-content">
+    {% for srv_name, log in logs.items() %}
+        <div role="tabpanel" class="tab-pane {% if loop.first %}active{% endif %}" id="{{ srv_name }}">
+            {{ log }}
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
