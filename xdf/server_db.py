@@ -79,7 +79,7 @@ class ServerDB:
                     except DoesNotExist:
                         XDFSpeedRecord.create(map=map, player=player, speed=v['speed'])
                     else:
-                        if record.player != player or record.speed < v['speed']:
+                        if record.speed < v['speed']:
                             logger.info('%s: speed record by %s', map.name, player.nickname)
                             record.player = player
                             record.speed = v['speed']

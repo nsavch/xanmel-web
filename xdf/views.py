@@ -136,8 +136,9 @@ def news_feed(request, server_id):
         server = Server.get(id=server_id)
     except DoesNotExist:
         raise Http404
-    time_records = XDFTimeRecord.select().join(Map).where(Map.server == server.id).order_by(XDFTimeRecord.timestamp.desc())[:20]
-    speed_records = XDFSpeedRecord.select().join(Map).where(Map.server == server.id).order_by(XDFSpeedRecord.timestamp.desc())[:20]
+    time_records = XDFTimeRecord.select().join(Map).where(Map.server == server.id).order_by(XDFTimeRecord.timestamp.desc())[:100]
+    # speed_records = XDFSpeedRecord.select().join(Map).where(Map.server == server.id).order_by(XDFSpeedRecord.timestamp.desc())[:20]
+    speed_records = []
     records = []
     for i in time_records:
         records.append({'type': 'time', 'record': i})
