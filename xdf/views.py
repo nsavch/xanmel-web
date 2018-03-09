@@ -128,3 +128,24 @@ def comparison(request, server_id):
         'results': results,
         'summary': summary
     })
+
+
+def news_feed(request, server_id):
+    servers = Server.select().where(Server.id << list(settings.XONOTIC_XDF_DATABASES.keys()))
+    try:
+        server = Server.get(id=server_id)
+    except DoesNotExist:
+        raise Http404
+    time_records = XDFTimeRecord.select().join(Map).where(Map.server == server.id).order_by(XDFTimeRecord.timestamp.desc())[:20]
+    speed_records = XDFSpeedRecord.select().join(Map).where(Map.server == server.id).order_by(XDFSpeedRecord.timestamp.desc())[:20]
+    records = []
+    for i in time_records:
+        records.append({'type': 'time', 'record': i})
+    for i in speed_records:
+        records.append({'type': 'speed', 'record': i})
+    records.sort(key=lambda x: x['record'].timestamp, reverse=True)
+    return render(request, 'xdf/news_feed.jinja', {
+        'servers': servers,
+        'active_server': server,
+        'records': records
+    })
