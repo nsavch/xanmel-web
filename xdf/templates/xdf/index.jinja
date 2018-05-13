@@ -1,0 +1,24 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}Xonotic DeFRaG{% endblock %}
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2>News Feed</h2>
+    <table class="table table-bordered table-striped">
+        <thead>
+        </thead>
+        <tbody>
+            {% for i in news %}
+                <tr>
+                    <td>{{ i.server.name }}</td>
+                    <td>{{ i.timestamp }}</td>
+                    <td>{{ i.map }}</td>
+                    <td>{{ i.event_type }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+{% endblock %}
