@@ -7,17 +7,71 @@
     <div class="col-md-12">
         <h1>Xonotic DeFRaG</h1>
         <h2 class="page-header">Maps</h2>
-        <table>
-            <thead>
+        <form>
+            <div class="row">
+                <div class="col">
+                    {{ bootstrap_field(form.maps, show_label=False) }}
+                </div>
 
+                <div class="col">
+                    {{ bootstrap_field(form.servers, show_label=False) }}
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-primary">refresh</button>
+                </div>
+            </div>
+        </form>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>Map</th>
+                <th>Total times</th>
+                <th>Time record by</th>
+                <th>Time record</th>
+                <th>Speed record by</th>
+                <th>Speed record</th>
+            </tr>
             </thead>
             <tbody>
-            {% for map in maps %}
+            {% for i in table %}
                 <tr>
-
+                    <td>
+                        {{ i['map'] }}
+                    </td>
+                    <td>
+                        {{ i['total_times'] }}
+                    </td>
+                    {% if i['time_record'] %}
+                        <td>
+                            {{ i['time_record']['nickname'] }}
+                        </td>
+                        <td>
+                            {% if i['time_record']['video_url'] %}
+                                <a href="{{ i['time_record']['video_url'] }}">{{ format_time(i['time_record']['time']) }}s</a>
+                            {% else %}
+                                {{ format_time(i['time_record']['time']) }}s
+                            {% endif %}
+                        </td>
+                    {% else %}
+                        <td>n/a</td>
+                        <td>n/a</td>
+                    {% endif %}
+                    {% if i['speed_record'] %}
+                        <td>
+                            {{ i['speed_record']['nickname'] }}
+                        </td>
+                        <td>
+                            {{ i['speed_record']['speed']|round }}
+                        </td>
+                    {% else %}
+                        <td>n/a</td>
+                        <td>n/a</td>
+                    {% endif %}
                 </tr>
             {% endfor %}
             </tbody>
         </table>
+    {{ render_pagination(request, total_maps) }}
     </div>
 {% endblock %}

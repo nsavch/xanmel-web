@@ -1,0 +1,15 @@
+<div>
+  <ul class="pagination">
+    <li class="page-item {% if current_page == 1 %}disabled{% endif %}">
+      <a class="page-link" href="{% if current_page != 1 %}?{{ prev_link }}{% endif %}">&laquo;</a>
+    </li>
+
+    <li class="page-item active">
+      <a class="page-link" href="#">Page {{ current_page }} of {{ total_pages }}</a>
+    </li>
+
+    <li class="page-item {% if current_page == total_pages %}disabled{% endif %}">
+      <a class="page-link" href="{% if current_page != total_pages %}?{{ next_link }}{% endif %}">&raquo;</a>
+    </li>
+  </ul>
+</div>

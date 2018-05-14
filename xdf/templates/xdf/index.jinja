@@ -21,6 +21,9 @@
                     {{ bootstrap_field(form.event_types, show_label=False) }}
                 </div>
                 <div class="col">
+                    {{ bootstrap_field(form.position_lte, show_label=False) }}
+                </div>
+                <div class="col">
                     <button class="btn btn-primary">refresh</button>
                 </div>
             </div>
@@ -39,5 +42,7 @@
             {% endfor %}
             </tbody>
         </table>
+        {{ render_pagination(request, total_news) }}
+
     </div>
 {% endblock %}
