@@ -133,7 +133,7 @@ class MapListView(View):
             if top_time is None or i['time'] < top_time:
                 top_time = i['time']
                 record = i
-                total_times += 1
+            total_times += 1
         return total_times, record
 
     def get(self, request):

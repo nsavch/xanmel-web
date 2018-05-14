@@ -16,7 +16,7 @@ def update_app():
 
 def install_requirements():
     with cd(app_path):
-        sudo('HOME=%s %s/bin/pip install -r requirements.txt' % (local_home, venv_path), user=local_user)
+        sudo('HOME=%s pipenv install' % (local_home, ), user=local_user)
     with cd('/home/xanmel/xanmel'):
         sudo('HOME=%s git pull' % local_home)
         sudo('HOME=%s %s/bin/python setup.py install' % (local_home, venv_path), user=local_user)
