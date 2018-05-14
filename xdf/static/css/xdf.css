@@ -4,3 +4,7 @@ body {
 .main-container {
     margin-top: 32px;
 }
+
+h2.page-header {
+    margin: 25px 0 20px 0;
+}

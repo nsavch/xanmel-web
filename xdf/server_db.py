@@ -109,6 +109,7 @@ class ServerDB:
             for pos in range(1, max_pos + 1):
                 if pos not in positions:
                     print('No position {} on map {}'.format(pos, map_name))
+                    max_pos -= 1
                     cur_shift += 1
                     continue
                 player = XDFPlayer.get_player(positions[pos]['player'], self.uid_to_name(positions[pos]['player']),
@@ -121,9 +122,11 @@ class ServerDB:
                     if prev_position.time > time and prev_position.server_pos == real_pos:
                         # Time improvement, same position
                         create_news = True
+                        prev_position.timestamp = current_time()
                     elif prev_position.time > time and prev_position.server_pos > real_pos:
                         # Time improvement, position improvement
                         create_news = True
+                        prev_position.timestamp = current_time()
                     elif prev_position.time == time and prev_position.server_pos == real_pos:
                         # Same record
                         continue
@@ -132,6 +135,7 @@ class ServerDB:
                         pass
                     elif prev_position.time < time:
                         # duplicate
+                        max_pos -= 1
                         cur_shift += 1
                         continue
                     prev_position.time = time
@@ -148,6 +152,8 @@ class ServerDB:
             XDFTimeRecord.delete().where(XDFTimeRecord.server == server,
                                          XDFTimeRecord.map == map_name,
                                          XDFTimeRecord.server_pos > max_pos).execute()
+            XDFTimeRecord.update(server_max_pos=max_pos).where(XDFTimeRecord.server == server,
+                                                               XDFTimeRecord.map == map_name).execute()
 
     def pull_video(self, server_id):
         url = settings.XONOTIC_XDF_VIDEO_DATABASES.get(server_id)
@@ -173,22 +179,11 @@ class ServerDB:
                 except DoesNotExist:
                     print('WARNING: existing youtube vid for non-existent record', map_name, time, youtube_id)
                     continue
-                if record.videos.count() > 0:
+                if record.video_url is not None:
                     # there's already video for this record
                     continue
-
-                XDFNewsFeed.delete().where(XDFNewsFeed.event_type == EventType.YOUTUBE_VID.value)
-
-                records = XDFTimeRecord.select().where(XDFTimeRecord.map == map_name, XDFTimeRecord.server == server)
-                old_videos = XDFVideo.select().where(XDFVideo.record.in_(records))
-                XDFNewsFeed.delete().where(XDFNewsFeed.event_type == EventType.YOUTUBE_VID.value, XDFNewsFeed.video.in_(old_videos))
-                XDFVideo.delete().where(XDFVideo.record.in_(records))
-
-                video = XDFVideo.create(record=record,
-                                        url='https://youtu.be/{}'.format(youtube_id))
-
-                XDFNewsFeed.create(event_type=EventType.YOUTUBE_VID.value,
-                                   server=server,
-                                   map=map_name,
-                                   video=video)
-
+                XDFTimeRecord.update(video_url=None).where(
+                    XDFTimeRecord.map == map_name,
+                    XDFTimeRecord.server == server).execute()
+                record.video_url = 'https://youtu.be/{}'.format(youtube_id)
+                record.save()

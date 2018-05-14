@@ -1,0 +1,34 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}Servers - Xonotic DeFRaG{% endblock %}
+
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2 class="page-header">Servers</h2>
+        {% for server in servers %}
+            <div class="card text-white bg-light mb-4 w-100">
+                <div class="card-header">
+                    <a href="xonotic://{{ server.public_addr }}">{{ server.public_addr }}</a>
+                    &mdash;
+                    {{ server.server_list_name }}
+
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title"><a href="#">{{ server.name }}</a></h4>
+                    <p class="card-text">
+                    <ul>
+                        <li>Admins: {{ server.admins }}</li>
+                        <li>Physics: {{ server.physics }} {# TODO: contextual help with physics description #}</li>
+                        <li>{{ count_maps(server) }} maps.</li>
+                        <li>{{ count_players(server) }} players.</li>
+                        <li>{{ server.time_records.count() }} times.</li>
+
+                    </ul>
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

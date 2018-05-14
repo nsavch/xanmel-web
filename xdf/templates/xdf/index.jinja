@@ -5,20 +5,39 @@
 {% block content %}
     <div class="col-md-12">
         <h1>Xonotic DeFRaG</h1>
-        <h2>News Feed</h2>
-    <table class="table table-bordered table-striped">
-        <thead>
-        </thead>
-        <tbody>
+        <h2 class="page-header">News Feed</h2>
+        <form>
+            <div class="row">
+                <div class="col">
+                    {{ bootstrap_field(form.maps, show_label=False) }}
+                </div>
+                <div class="col">
+                    {{ bootstrap_field(form.players, show_label=False) }}
+                </div>
+                <div class="col">
+                    {{ bootstrap_field(form.servers, show_label=False) }}
+                </div>
+                <div class="col">
+                    {{ bootstrap_field(form.event_types, show_label=False) }}
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary">refresh</button>
+                </div>
+            </div>
+        </form>
+        <table class="table table-bordered table-striped">
+            <thead>
+            </thead>
+            <tbody>
             {% for i in news %}
                 <tr>
                     <td>{{ i.server.name }}</td>
-                    <td>{{ i.timestamp }}</td>
-                    <td>{{ i.map }}</td>
-                    <td>{{ i.event_type }}</td>
+                    <td>{{ format_timestamp(i.timestamp) }}</td>
+                    <td style="white-space:nowrap">{{ i.map }}</td>
+                    <td>{{ format_news_item(i)|safe }}</td>
                 </tr>
             {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     </div>
 {% endblock %}
