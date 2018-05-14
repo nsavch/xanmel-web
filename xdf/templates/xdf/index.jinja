@@ -36,7 +36,7 @@
                 <tr>
                     <td>{{ i.server.name }}</td>
                     <td>{{ format_timestamp(i.timestamp) }}</td>
-                    <td style="white-space:nowrap">{{ i.map }}</td>
+                    <td style="white-space:nowrap"><a href="{{ url('xdf:map', urlquote(i.map)) }}">{{ i.map }}</a></td>
                     <td>{{ format_news_item(i)|safe }}</td>
                 </tr>
             {% endfor %}

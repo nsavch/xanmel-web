@@ -1,0 +1,70 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}{{ map_name }} - Xonotic DeFRaG{% endblock %}
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2 class="page-header">{{ map_name }}</h2>
+        <form class="mb-4">
+            <div class="row">
+                <div class="col-lg-2 col-md-3 col-sm-4 col-51">
+                    {{ bootstrap_field(form.servers, show_label=False) }}
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-primary">refresh</button>
+                </div>
+            </div>
+        </form>
+        <div class="row">
+            <div class="col-lg-6 col-md-5 col-sm-12 col-12">
+                <h3>Speed records</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+
+                    </thead>
+                    <tbody>
+                    {% for i in speed_records %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ i.player.nickname }}</td>
+                            <td>{{ i.speed|round }}qu/s</td>
+                            <td style="white-space:nowrap">{{ i.server.name }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% for i in time_records %}
+                    {% if i.video_url %}
+                        {{ i.youtube_embed_code|safe }}
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="col-lg-6 col-md-7 col-sm-12 col-12">
+                <h3>Time Records</h3>
+                <table class="table table-bordered table-striped">
+                    <thead>
+
+                    </thead>
+                    <tbody>
+                    {% for i in time_records %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ i.player.nickname }}</td>
+                            <td style="white-space:nowrap">
+                                {% if i.video_url %}
+                                <a target="_blank" href="{{ i.video_url }}">{{ format_time(i.time) }}s <i class="fab fa-youtube"></i></a>
+                                {% else %}
+                                {{ format_time(i.time) }}s
+                                {% endif %}
+                            </td>
+                            <td style="white-space:nowrap">{{ i.server.name }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

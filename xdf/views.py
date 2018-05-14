@@ -1,3 +1,5 @@
+import urllib.parse
+
 from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
@@ -7,7 +9,7 @@ from peewee import fn
 from xanmel.modules.xonotic.models import *
 from xdf.templatetags.xdf import format_time
 
-from .forms import NewsFeedFilterForm, MapListFilterForm
+from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm
 from .utils import paginate_query
 
 
@@ -25,22 +27,24 @@ class IndexView(View):
             )
         elif news_item.event_type == EventType.TIME_RECORD.value:
             if news_item.time_record.video_url:
-                yt_link = '<a href="{}">video</a>'.format(news_item.time_record.video_url)
+                yt_link = '<a target="_blank" href="{}">{}s <i class="fab fa-youtube"></i></a>'.format(
+                    news_item.time_record.video_url,
+                    format_time(news_item.time_record.time),
+                )
             else:
-                yt_link = ''
-            return "{} set time &mdash; {}s (server {}/{}, global {}/{}) {}".format(
+                yt_link = '{}s'.format(format_time(news_item.time_record.time),)
+            return "{} set time &mdash; {} (server {}/{}, global {}/{})".format(
                 format_player_with_link(news_item.time_record.player),
-                format_time(news_item.time_record.time),
+                yt_link,
                 news_item.time_record.server_pos,
                 news_item.time_record.server_max_pos,
                 news_item.time_record.global_pos,
                 news_item.time_record.global_max_pos,
-                yt_link
             )
 
     def get(self, request):
-        filter_form = NewsFeedFilterForm(data=request.GET)
-        if not filter_form.is_valid():
+        form = NewsFeedFilterForm(data=request.GET)
+        if not form.is_valid():
             raise Http404
         p1 = XDFPlayer.alias()
         p2 = XDFPlayer.alias()
@@ -50,23 +54,21 @@ class IndexView(View):
                 .join(XDFSpeedRecord, JOIN_LEFT_OUTER, on=(XDFNewsFeed.speed_record == XDFSpeedRecord.id))
                 .join(p2, JOIN_LEFT_OUTER, on=(XDFSpeedRecord.player == p2.id))
                 .order_by(XDFNewsFeed.timestamp.desc()))
-        if filter_form.cleaned_data['maps']:
-            pattern = '%{}%'.format(filter_form.cleaned_data['maps'])
+        if form.cleaned_data['maps']:
+            pattern = '%{}%'.format(form.cleaned_data['maps'])
             news = news.where(XDFTimeRecord.map ** pattern | XDFSpeedRecord.map ** pattern)
-        if filter_form.cleaned_data['players']:
-            pattern = '%{}%'.format(filter_form.cleaned_data['players'])
+        if form.cleaned_data['players']:
+            pattern = '%{}%'.format(form.cleaned_data['players'])
             news = news.where(p1.nickname ** pattern | p2.nickname ** pattern)
-        servers = filter_form.cleaned_data['servers']
+        servers = form.cleaned_data['servers']
         news = news.where(XDFTimeRecord.server.in_(servers) | XDFSpeedRecord.server.in_(servers))
-        news = news.where(XDFNewsFeed.event_type.in_(filter_form.cleaned_data['event_types']))
-        if filter_form.cleaned_data['position_lte']:
-            news = news.where(XDFTimeRecord.server_pos <= filter_form.cleaned_data['position_lte'])
-
-
+        news = news.where(XDFNewsFeed.event_type.in_(form.cleaned_data['event_types']))
+        if form.cleaned_data['position_lte']:
+            news = news.where(XDFTimeRecord.server_pos <= form.cleaned_data['position_lte'])
         total_news = news.count()
         news = paginate_query(request, news)
         return render(request, 'xdf/index.jinja', {
-            'form': filter_form,
+            'form': form,
             'news': news,
             'total_news': total_news,
             'format_news_item': self.format_news_item,
@@ -122,7 +124,7 @@ class MapListView(View):
         q = (XDFTimeRecord.select(XDFPlayer.nickname.alias('nickname'),
                                   XDFPlayer.id.alias('player_id'),
                                   XDFTimeRecord.time.alias('time'),
-                                  XDFTimeRecord.time.alias('video_url'))
+                                  XDFTimeRecord.video_url.alias('video_url'))
              .join(XDFPlayer)
              .where(XDFTimeRecord.map == map_name))
         if servers:
@@ -168,4 +170,40 @@ class MapListView(View):
             'table': table,
             'form': form,
             'total_maps': total_maps
+        })
+
+
+class MapView(View):
+    def get(self, request, map_name):
+        form = MapFilterForm(data=request.GET)
+        if not form.is_valid():
+            raise Http404
+        map_name = urllib.parse.unquote(map_name)
+        servers = form.cleaned_data['servers']
+        speed_records = (XDFSpeedRecord.select()
+                         .where(XDFSpeedRecord.map == map_name)
+                         .where(XDFSpeedRecord.server.in_(servers))
+                         .order_by(XDFSpeedRecord.speed.desc()))
+        speed_records_dedup = []
+        players = set()
+        for i in speed_records:
+            if i.player not in players:
+                speed_records_dedup.append(i)
+                players.add(i.player)
+        time_records_dedup = []
+        players = set()
+        time_records = (XDFTimeRecord.select()
+                        .where(XDFTimeRecord.map == map_name)
+                        .where(XDFTimeRecord.server.in_(servers))
+                        .order_by(XDFTimeRecord.time, XDFTimeRecord.server_pos))
+        for i in time_records:
+            if i.player not in players:
+                time_records_dedup.append(i)
+                players.add(i.player)
+        return render(request, 'xdf/map.jinja', {
+            'current_nav_tab': 'maps',
+            'map_name': map_name,
+            'speed_records': speed_records_dedup,
+            'time_records': time_records_dedup,
+            'form': form
         })

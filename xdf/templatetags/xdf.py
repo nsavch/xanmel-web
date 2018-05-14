@@ -51,3 +51,8 @@ def render_pagination(request, total):
         'next_link': next_link,
         'total_pages': total // page_size + 1,
     })
+
+
+@library.global_function
+def urlquote(s):
+    return urllib.parse.quote(s)

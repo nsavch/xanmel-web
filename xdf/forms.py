@@ -65,3 +65,19 @@ class MapListFilterForm(forms.Form):
             initial=server_ids,
             widget=forms.CheckboxSelectMultiple(),
             required=False)
+
+
+class MapFilterForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        servers = list(XDFServer.select(XDFServer.id, XDFServer.name))
+        server_ids = [i.id for i in servers]
+        if  'servers' not in kwargs['data']:
+            kwargs['data'] = kwargs['data'].copy()
+            for i in server_ids:
+                kwargs['data'].update(servers=i)
+        super().__init__(*args, **kwargs)
+        self.fields['servers'] = forms.MultipleChoiceField(
+            choices=[(i.id, i.name) for i in servers],
+            initial=server_ids,
+            widget=forms.CheckboxSelectMultiple(),
+            required=False)

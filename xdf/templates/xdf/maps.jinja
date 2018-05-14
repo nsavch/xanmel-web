@@ -37,7 +37,7 @@
             {% for i in table %}
                 <tr>
                     <td>
-                        {{ i['map'] }}
+                        <a href="{{ url('xdf:map', urlquote(i['map'])) }}">{{ i['map'] }}</a>
                     </td>
                     <td>
                         {{ i['total_times'] }}
@@ -48,7 +48,7 @@
                         </td>
                         <td>
                             {% if i['time_record']['video_url'] %}
-                                <a href="{{ i['time_record']['video_url'] }}">{{ format_time(i['time_record']['time']) }}s</a>
+                                <a target="_blank" href="{{ i['time_record']['video_url'] }}">{{ format_time(i['time_record']['time']) }}s <i class="fab fa-youtube"></i></a>
                             {% else %}
                                 {{ format_time(i['time_record']['time']) }}s
                             {% endif %}
