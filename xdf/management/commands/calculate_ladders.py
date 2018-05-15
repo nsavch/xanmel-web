@@ -23,6 +23,7 @@ class Command(BaseCommand):
                             data = defaultdict(int)
                             for speed_record in XDFSpeedRecord.select().where(XDFSpeedRecord.player == player):
                                 if XDFSpeedRecord.select().where(
+                                        XDFSpeedRecord.map == speed_record.map,
                                         XDFSpeedRecord.player != player,
                                         XDFSpeedRecord.speed > speed_record.speed).count() == 0:
                                     points += 10

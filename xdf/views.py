@@ -221,7 +221,7 @@ class ClassicLadderView(View):
     def get(self, request):
         form = LadderFilterForm(data=request.GET)
         form.is_valid()
-        t = int(form.cleaned_data['ladder_type']) or LadderType.GLOBAL.value
+        t = form.cleaned_data['ladder_type'] and int(form.cleaned_data['ladder_type']) or LadderType.GLOBAL.value
         s = form.cleaned_data['server']
         players = form.cleaned_data['players']
 
