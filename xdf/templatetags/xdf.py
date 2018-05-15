@@ -22,11 +22,11 @@ def format_timestamp(dt):
 @library.global_function
 def format_time(time):
     if time < 60:
-        return "{:.2f}".format(time)
+        return "{:0>5.2f}".format(time)
     else:
         minutes = time // 60
         seconds = time % 60
-        return "{}:{:.2f}".format(minutes, seconds)
+        return "{}:{:0>5.2f}".format(minutes, seconds)
 
 
 @library.global_function

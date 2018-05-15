@@ -150,9 +150,10 @@ class MapListView(View):
             servers = form.cleaned_data['servers']
             maps = maps.where(XDFTimeRecord.server.in_(form.cleaned_data['servers']))
 
+        maps = maps.distinct()
         total_maps = maps.count()
         maps = paginate_query(request, maps)
-        maps = maps.distinct().tuples()
+        maps = maps.tuples()
 
         table = []
         for i in maps:
