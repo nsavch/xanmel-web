@@ -239,7 +239,7 @@ class ClassicLadderView(View):
                                 XDFLadder.server == s)
                          .order_by(XDFLadderPosition.position))
         if players:
-            positions = positions.join(XDFPlayer).where(XDFPlayer.nickname ** '%{}%'.format(players))
+            positions = positions.switch(XDFLadderPosition).join(XDFPlayer).where(XDFPlayer.nickname ** '%{}%'.format(players))
         total_positions = positions.count()
         positions = paginate_query(request, positions)
         columns = [str(i) for i in range(1, 11)]
