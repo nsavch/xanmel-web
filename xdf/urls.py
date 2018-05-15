@@ -10,5 +10,6 @@ urlpatterns = [
     url('^servers/$', ServerListView.as_view(), name='servers'),
     url('^maps/$', MapListView.as_view(), name='maps'),
     url('^maps/(.*)/$', MapView.as_view(), name='map'),
-    url('^classic-ladder/$', ClassicLadderView.as_view(), name='classic-ladder')
+    url('^players/$', ClassicLadderView.as_view(), name='classic-ladder'),
+    url(r'^players/(\d+)/$', PlayerView.as_view(), name='player')
 ]

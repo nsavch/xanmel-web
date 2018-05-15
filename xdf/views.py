@@ -3,6 +3,7 @@ import urllib.parse
 from django.http import Http404
 from django.shortcuts import render
 from django.conf import settings
+from django.urls import reverse
 from django.views import View
 from peewee import fn
 
@@ -14,7 +15,10 @@ from .utils import paginate_query
 
 
 def format_player_with_link(player):
-    return '<a href="#">{}</a>'.format(player.nickname)
+    return '<a href="{}">{}</a>'.format(
+        reverse('xdf:player', args=(player.id, )),
+        player.nickname
+    )
 
 
 class IndexView(View):
@@ -141,7 +145,7 @@ class MapListView(View):
         if not form.is_valid():
             raise Http404()
 
-        maps = XDFTimeRecord.select(XDFTimeRecord.map)
+        maps = XDFTimeRecord.select(XDFTimeRecord.map).order_by(XDFTimeRecord.map)
         servers = None
 
         if form.cleaned_data['maps']:
@@ -251,4 +255,16 @@ class ClassicLadderView(View):
             'total_positions': total_positions,
             'form': form,
             'count_rest': self.count_rest
+        })
+
+
+class PlayerView(View):
+    def get(self, request, player_id):
+        try:
+            player = XDFPlayer.get(id=player_id)
+        except DoesNotExist:
+            raise Http404
+        return render(request, 'xdf/player.jinja', {
+            'player': player,
+            'current_nav_tab': 'players'
         })

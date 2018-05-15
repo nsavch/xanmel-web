@@ -44,7 +44,9 @@
                     </td>
                     {% if i['time_record'] %}
                         <td>
-                            {{ i['time_record']['nickname'] }}
+                            <a href="{{ url('xdf:player', i['time_record']['player_id']) }}">
+                                {{ i['time_record']['nickname'] }}
+                            </a>
                         </td>
                         <td>
                             {% if i['time_record']['video_url'] %}
@@ -59,7 +61,9 @@
                     {% endif %}
                     {% if i['speed_record'] %}
                         <td>
-                            {{ i['speed_record']['nickname'] }}
+                            <a href="{{ url('xdf:player', i['speed_record']['player_id']) }}">
+                                {{ i['speed_record']['nickname'] }}
+                            </a>
                         </td>
                         <td>
                             {{ i['speed_record']['speed']|round }}

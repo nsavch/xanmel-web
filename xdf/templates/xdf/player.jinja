@@ -1,0 +1,16 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}{{ player.nickname }} - Xonotic DeFRaG{% endblock %}
+
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2 class="page-header">{{ player.nickname }}</h2>
+        {% if player.stats_id %}<a href="https://stats.xonotic.org/player/{{ player.stats_id }}">xonstats account</a>{% endif %}
+        <h3>Global Ladder Position</h3>
+        <table class="">
+
+        </table>
+    </div>
+{% endblock %}

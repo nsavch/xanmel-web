@@ -42,7 +42,7 @@
             {% for pos in positions %}
                 <tr>
                     <td>{{ pos.position }}</td>
-                    <td><a href="#">{{ pos.player.nickname }}</a></td>
+                    <td><a href="{{ url('xdf:player', pos.player_id) }}">{{ pos.player.nickname }}</a></td>
                     <td>{{ pos.points|round }}</td>
                     <td>{{ pos.data.get('speed', 0) }}</td>
                     {% for i in columns %}
