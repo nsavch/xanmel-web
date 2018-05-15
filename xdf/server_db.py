@@ -73,9 +73,15 @@ class ServerDB:
 
     def save(self, server_id):
         server = XDFServer.get(id=server_id)
+        prev_speed_records = {}
+        for i in XDFSpeedRecord.select().where(XDFSpeedRecord.server == server):
+            prev_speed_records[i.map] = i
+        changed_maps = set()
+        prev_time_records = XDFTimeRecord.get_records_for(server)
         for map_name, item in self.maps.items():
             positions = {}
             max_pos = 0
+
             for k, v in item.items():
                 if not v.get('player'):
                     # Why?
@@ -85,12 +91,8 @@ class ServerDB:
                                               settings.XONOTIC_ELO_REQUEST_SIGNATURE)
                 if k == 'speed':
                     create_news = False
-                    try:
-                        record = XDFSpeedRecord.get(XDFSpeedRecord.map == map_name, XDFSpeedRecord.server == server)
-                    except DoesNotExist:
-                        record = XDFSpeedRecord.create(map=map_name, server=server, player=player, speed=v['speed'])
-                        create_news = True
-                    else:
+                    if map_name in prev_speed_records:
+                        record = prev_speed_records[map_name]
                         if record.speed < v['speed']:
                             logger.info('%s: speed record by %s', map_name, player.nickname)
                             record.player = player
@@ -98,6 +100,10 @@ class ServerDB:
                             record.timestamp = current_time()
                             record.save()
                             create_news = True
+                    else:
+                        record = XDFSpeedRecord.create(map=map_name, server=server, player=player, speed=v['speed'])
+                        create_news = True
+
                     if create_news:
                         XDFNewsFeed.create(event_type=EventType.SPEED_RECORD.value,
                                            speed_record=record)
@@ -115,7 +121,7 @@ class ServerDB:
                 player = XDFPlayer.get_player(positions[pos]['player'], self.uid_to_name(positions[pos]['player']),
                                               settings.XONOTIC_ELO_REQUEST_SIGNATURE)
                 time = positions[pos]['time']
-                prev_position = XDFTimeRecord.get_record_for(map_name, player, server)
+                prev_position = prev_time_records[map_name].get(player.id)
                 real_pos = pos - cur_shift
                 create_news = False
                 if prev_position:
@@ -123,17 +129,20 @@ class ServerDB:
                         # Time improvement, same position
                         create_news = True
                         prev_position.timestamp = current_time()
+                        changed_maps.add(map_name)
                     elif prev_position.time > time and prev_position.server_pos > real_pos:
                         # Time improvement, position improvement
                         create_news = True
                         prev_position.timestamp = current_time()
+                        changed_maps.add(map_name)
                     elif prev_position.time == time and prev_position.server_pos == real_pos:
                         # Same record
                         continue
                     elif prev_position.time == time and prev_position.server_pos <= real_pos:
                         # position got worse
-                        pass
+                        changed_maps.add(map_name)
                     elif prev_position.time < time:
+                        changed_maps.add(map_name)
                         # duplicate
                         max_pos -= 1
                         cur_shift += 1
@@ -145,6 +154,7 @@ class ServerDB:
                 else:
                     # New time record
                     create_news = True
+                    changed_maps.add(map_name)
                     record = XDFTimeRecord.create(map=map_name, server=server, player=player, server_pos=real_pos, time=time)
                 if create_news:
                     XDFNewsFeed.create(event_type=EventType.TIME_RECORD.value,
@@ -154,6 +164,7 @@ class ServerDB:
                                          XDFTimeRecord.server_pos > max_pos).execute()
             XDFTimeRecord.update(server_max_pos=max_pos).where(XDFTimeRecord.server == server,
                                                                XDFTimeRecord.map == map_name).execute()
+        return changed_maps
 
     def pull_video(self, server_id):
         url = settings.XONOTIC_XDF_VIDEO_DATABASES.get(server_id)
@@ -179,11 +190,11 @@ class ServerDB:
                 except DoesNotExist:
                     print('WARNING: existing youtube vid for non-existent record', map_name, time, youtube_id)
                     continue
-                if record.video_url is not None:
-                    # there's already video for this record
+                video_url = 'https://youtu.be/{}'.format(youtube_id)
+                if record.video_url == video_url:
                     continue
                 XDFTimeRecord.update(video_url=None).where(
                     XDFTimeRecord.map == map_name,
                     XDFTimeRecord.server == server).execute()
-                record.video_url = 'https://youtu.be/{}'.format(youtube_id)
+                record.video_url = video_url
                 record.save()
