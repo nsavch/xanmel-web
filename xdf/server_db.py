@@ -125,24 +125,18 @@ class ServerDB:
                 real_pos = pos - cur_shift
                 create_news = False
                 if prev_position:
-                    if prev_position.time > time and prev_position.server_pos == real_pos:
-                        # Time improvement, same position
-                        create_news = True
-                        prev_position.timestamp = current_time()
-                        changed_maps.add(map_name)
-                    elif prev_position.time > time and prev_position.server_pos > real_pos:
-                        # Time improvement, position improvement
+                    if prev_position.time > time:
+                        # Time improvement
                         create_news = True
                         prev_position.timestamp = current_time()
                         changed_maps.add(map_name)
                     elif prev_position.time == time and prev_position.server_pos == real_pos:
                         # Same record
                         continue
-                    elif prev_position.time == time and prev_position.server_pos <= real_pos:
-                        # position got worse
+                    elif prev_position.time == time and prev_position.server_pos != real_pos:
+                        # position changed without time change
                         changed_maps.add(map_name)
                     elif prev_position.time < time:
-                        changed_maps.add(map_name)
                         # duplicate
                         max_pos -= 1
                         cur_shift += 1
