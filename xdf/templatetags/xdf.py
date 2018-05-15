@@ -42,9 +42,9 @@ def render_pagination(request, total):
 
     qd = request.GET.copy()
     qd['page_number'] = page_number - 1
-    prev_link = urllib.parse.urlencode(qd, doseq=True)
+    prev_link = qd.urlencode()
     qd['page_number'] = page_number + 1
-    next_link = urllib.parse.urlencode(qd, doseq=True)
+    next_link = qd.urlencode()
     return render_to_string('xdf/_pagination.jinja', {
         'prev_link': prev_link,
         'current_page': page_number,
