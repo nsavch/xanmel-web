@@ -17,6 +17,7 @@ class Command(BaseCommand):
             sdb = ServerDB.parse_server(server_id)
             changed_maps = changed_maps.union(sdb.save(server_id))
             sdb.pull_video(server_id)
+        print(changed_maps)
         print('Updating global pos')
         XDFTimeRecord.update_global_physics_pos(changed_maps)
         XDFTimeRecord.update_global_pos(changed_maps)

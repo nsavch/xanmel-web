@@ -155,13 +155,15 @@ class ServerDB:
                     # New time record
                     create_news = True
                     changed_maps.add(map_name)
-                    record = XDFTimeRecord.create(map=map_name, server=server, player=player, server_pos=real_pos, time=time)
+                    record = XDFTimeRecord.create(map=map_name, server=server, player=player, server_pos=real_pos,
+                                                  time=time)
                 if create_news:
                     XDFNewsFeed.create(event_type=EventType.TIME_RECORD.value,
                                        time_record=record)
-            XDFTimeRecord.delete().where(XDFTimeRecord.server == server,
-                                         XDFTimeRecord.map == map_name,
-                                         XDFTimeRecord.server_pos > max_pos).execute()
+            for i in XDFTimeRecord.select().where(XDFTimeRecord.server == server,
+                                                  XDFTimeRecord.map == map_name,
+                                                  XDFTimeRecord.server_pos > max_pos):
+                i.delete_instance(recursive=True)
             XDFTimeRecord.update(server_max_pos=max_pos).where(XDFTimeRecord.server == server,
                                                                XDFTimeRecord.map == map_name).execute()
         return changed_maps
