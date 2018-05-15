@@ -29,8 +29,8 @@
             <li class="nav-item {% if current_nav_tab == 'maps' %}active{% endif %}">
                 <a class="nav-link" href="{{ url('xdf:maps') }}">Maps</a>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Players</a>
+            <li class="nav-item" {% if current_nav_tab == 'players' %}active{% endif %}">
+                <a class="nav-link" href="{{ url('xdf:classic-ladder') }}">Players</a>
             </li>
 
         </ul>
@@ -55,5 +55,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
         integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
         crossorigin="anonymous"></script>
-
+{% block extra_js %}
+{% endblock %}
 </html>

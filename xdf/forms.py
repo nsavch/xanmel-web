@@ -71,7 +71,7 @@ class MapFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         servers = list(XDFServer.select(XDFServer.id, XDFServer.name))
         server_ids = [i.id for i in servers]
-        if  'servers' not in kwargs['data']:
+        if 'servers' not in kwargs['data']:
             kwargs['data'] = kwargs['data'].copy()
             for i in server_ids:
                 kwargs['data'].update(servers=i)
@@ -81,3 +81,14 @@ class MapFilterForm(forms.Form):
             initial=server_ids,
             widget=forms.CheckboxSelectMultiple(),
             required=False)
+
+
+class LadderFilterForm(forms.Form):
+    players = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'player name matches'}),
+                              required=False)
+    ladder_type = forms.ChoiceField(choices=LadderType.choices(), required=False)
+
+    def __init__(self, *args, **kwargs):
+        servers = list(XDFServer.select(XDFServer.id, XDFServer.name))
+        super().__init__(*args, **kwargs)
+        self.fields['server'] = forms.ChoiceField(choices=[(i.id, i.name) for i in servers], required=False)

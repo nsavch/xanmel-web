@@ -1,0 +1,77 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}Classic Ladder - Xonotic DeFRaG{% endblock %}
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2 class="page-header">Classic Ladder</h2>
+        <form class="filter-form">
+            <div class="row">
+                <div class="col">
+                    {{ bootstrap_field(form.players, show_label=False) }}
+                </div>
+
+                <div class="col">
+                    {{ bootstrap_field(form.ladder_type, show_label=False) }}
+                </div>
+
+                <div id="server-col" class="col d-none">
+                    {{ bootstrap_field(form.server, show_label=False) }}
+                </div>
+
+                <div class="col">
+                    <button class="btn btn-primary">refresh</button>
+                </div>
+            </div>
+        </form>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>Points</th>
+                <th>Speed Records</th>
+                {% for i in columns %}
+                    <th>{{ i }}</th>
+                {% endfor %}
+                <th>&gt; 10</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pos in positions %}
+                <tr>
+                    <td>{{ pos.position }}</td>
+                    <td><a href="#">{{ pos.player.nickname }}</a></td>
+                    <td>{{ pos.points|round }}</td>
+                    <td>{{ pos.data.get('speed', 0) }}</td>
+                    {% for i in columns %}
+                        <td>{{ pos.data.get(i, 0) }}</td>
+                    {% endfor %}
+                    <td>{{ count_rest(pos.data) }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {{ render_pagination(request, total_positions) }}
+
+    </div>
+
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        function handleFormChange() {
+            var val = $('select#id_ladder_type').val();
+            console.log(val);
+            if (val === '2') {
+                $('#server-col').removeClass('d-none');
+            } else {
+                $('#server-col').addClass('d-none');
+            }
+
+        }
+        handleFormChange();
+        $('select#id_ladder_type').on('change', handleFormChange);
+    </script>
+{% endblock %}

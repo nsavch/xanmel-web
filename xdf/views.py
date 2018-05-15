@@ -9,7 +9,7 @@ from peewee import fn
 from xanmel.modules.xonotic.models import *
 from xdf.templatetags.xdf import format_time
 
-from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm
+from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm, LadderFilterForm
 from .utils import paginate_query
 
 
@@ -207,4 +207,48 @@ class MapView(View):
             'speed_records': speed_records_dedup,
             'time_records': time_records_dedup,
             'form': form
+        })
+
+
+class ClassicLadderView(View):
+    @staticmethod
+    def count_rest(data):
+        res = 0
+        for i in range(11, 101):
+            res += data.get(str(i), 0)
+        return res
+
+    def get(self, request):
+        form = LadderFilterForm(data=request.GET)
+        form.is_valid()
+        t = int(form.cleaned_data['ladder_type']) or LadderType.GLOBAL.value
+        s = form.cleaned_data['server']
+        players = form.cleaned_data['players']
+
+        if t == LadderType.GLOBAL.value:
+            positions = (XDFLadderPosition.select()
+                         .join(XDFLadder)
+                         .where(XDFLadder.algo == LadderAlgo.CLASSIC.value,
+                                XDFLadder.type == LadderType.GLOBAL.value)
+                         .order_by(XDFLadderPosition.position))
+        else:
+            positions = (XDFLadderPosition.select()
+                         .join(XDFLadder)
+                         .where(XDFLadder.algo == LadderAlgo.CLASSIC.value,
+                                XDFLadder.type == LadderType.SERVER.value,
+                                XDFLadder.server == s)
+                         .order_by(XDFLadderPosition.position))
+        if players:
+            positions = positions.join(XDFPlayer).where(XDFPlayer.nickname ** '%{}%'.format(players))
+        total_positions = positions.count()
+        positions = paginate_query(request, positions)
+        columns = [str(i) for i in range(1, 11)]
+
+        return render(request, 'xdf/ladder_classic.jinja', {
+            'current_nav_tab': 'players',
+            'positions': positions,
+            'columns': columns,
+            'total_positions': total_positions,
+            'form': form,
+            'count_rest': self.count_rest
         })
