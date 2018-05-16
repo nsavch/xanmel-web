@@ -11,5 +11,6 @@ urlpatterns = [
     url('^maps/$', MapListView.as_view(), name='maps'),
     url('^maps/(.*)/$', MapView.as_view(), name='map'),
     url('^players/$', ClassicLadderView.as_view(), name='classic-ladder'),
-    url(r'^players/(\d+)/$', PlayerView.as_view(), name='player')
+    url(r'^players/(\d+)/$', PlayerView.as_view(), name='player'),
+    url(r'^players/compare/$', CompareView.as_view(), name='compare')
 ]

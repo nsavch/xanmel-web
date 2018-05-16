@@ -1,0 +1,54 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}{{ player1.nickname }} vs {{ player2.nickname }} - Xonotic DeFRaG{% endblock %}
+
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2>{{ player1.nickname }} vs {{ player2.nickname }}</h2>
+        <ul>
+            <li>{{ player1.nickname }} is better on <strong>{{ summary['p1_better'] }}</strong> maps</li>
+            <li>{{ player2.nickname }} is better on <strong>{{ summary['p2_better'] }}</strong> maps</li>
+            <li>Total gap is <strong>{{ summary['total_gap']|floatformat(0) }}%</strong></li>
+        </ul>
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>
+                    map
+                </th>
+                <th>
+                    {{ player1.nickname }}
+                </th>
+                <th>
+                    {{ player2.nickname }}
+                </th>
+                <th>
+
+                </th>
+            </tr>
+            {% for m, p1, mp, t1, p2, t2, gap in results %}
+                <tr>
+                    <td><a href="{{ url('xdf:map', urlquote(m)) }}">{{ m }}</a></td>
+                    <td>#{{ p1 }}/{{ mp }} &mdash; {{ format_time(t1) }}s</td>
+                    <td>#{{ p2 }}/{{ mp }} &mdash; {{ format_time(t2) }}s</td>
+                    <td style="min-width: 300px">
+                        <div class="progress">
+                            {% if t1 < t2 %}
+                                <div class="progress-bar bg-success" role="progressbar"
+                                     style="width: {{ gap | floatformat(0) }}%; min-width: 2em;">
+                                    {{ gap|floatformat(0) }}%
+                                </div>
+                            {% else %}
+                                <div class="progress-bar bg-danger" role="progressbar"
+                                     style="width: {{ gap | floatformat(0) }}%; min-width: 2em;">
+                                    {{ gap|floatformat(0) }}%
+                                </div>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

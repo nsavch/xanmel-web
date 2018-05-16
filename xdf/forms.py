@@ -95,9 +95,9 @@ class LadderFilterForm(forms.Form):
 
 
 class CompareWithForm(forms.Form):
-    source_player_id = forms.IntegerField(widget=forms.HiddenInput())
+    player1 = forms.IntegerField(widget=forms.HiddenInput())
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         players = XDFPlayer.select().order_by(XDFPlayer.nickname)
-        self.fields['player'] = forms.ChoiceField(choices=[(i.id, i.nickname) for i in players])
+        self.fields['player2'] = forms.ChoiceField(choices=[(i.id, i.nickname) for i in players])

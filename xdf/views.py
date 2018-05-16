@@ -1,6 +1,6 @@
 import urllib.parse
 
-from django.http import Http404
+from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render
 from django.conf import settings
 from django.urls import reverse
@@ -16,7 +16,7 @@ from .utils import paginate_query
 
 def format_player_with_link(player):
     return '<a href="{}">{}</a>'.format(
-        reverse('xdf:player', args=(player.id, )),
+        reverse('xdf:player', args=(player.id,)),
         player.nickname
     )
 
@@ -45,6 +45,7 @@ class HelpersMixin:
                 news_item.time_record.global_pos,
                 news_item.time_record.global_max_pos,
             )
+
     @staticmethod
     def count_rest(data):
         res = 0
@@ -245,7 +246,8 @@ class ClassicLadderView(View, HelpersMixin):
                                 XDFLadder.server == s)
                          .order_by(XDFLadderPosition.position))
         if players:
-            positions = positions.switch(XDFLadderPosition).join(XDFPlayer).where(XDFPlayer.nickname ** '%{}%'.format(players))
+            positions = positions.switch(XDFLadderPosition).join(XDFPlayer).where(
+                XDFPlayer.nickname ** '%{}%'.format(players))
         total_positions = positions.count()
         positions = paginate_query(request, positions)
         columns = [str(i) for i in range(1, 11)]
@@ -267,7 +269,7 @@ class PlayerView(View, HelpersMixin):
             player = XDFPlayer.get(id=player_id)
         except DoesNotExist:
             raise Http404
-        compare_form = CompareWithForm(initial={'source_player_id': player.id})
+        compare_form = CompareWithForm(initial={'player1': player.id})
         ladder_positions = (XDFLadderPosition.select()
                             .join(XDFLadder)
                             .where(XDFLadderPosition.player == player)
@@ -292,4 +294,71 @@ class PlayerView(View, HelpersMixin):
             'format_news_item': self.format_news_item,
             'best_records': best_records,
             'compare_form': compare_form
+        })
+
+
+class CompareView(View):
+    def get(self, request):
+        try:
+            player1_id = int(request.GET['player1'])
+            player2_id = int(request.GET['player2'])
+        except (KeyError, TypeError, ValueError):
+            return HttpResponseBadRequest()
+        try:
+            player1 = XDFPlayer.get(id=player1_id)
+            player2 = XDFPlayer.get(id=player2_id)
+        except DoesNotExist:
+            raise Http404()
+
+        records = (XDFTimeRecord.select()
+                   .where(XDFTimeRecord.player == player1 | XDFTimeRecord.player == player2)
+                   .order_by(XDFTimeRecord.map))
+
+        tr_tbl1 = XDFTimeRecord.alias()
+        tr_tbl2 = XDFTimeRecord.alias()
+
+        q = (tr_tbl1.select(tr_tbl1.map,
+                            tr_tbl1.global_pos,
+                            tr_tbl1.global_max_pos,
+                            tr_tbl1.time,
+                            tr_tbl2.global_pos,
+                            tr_tbl2.time)
+             .join(tr_tbl2, on=(tr_tbl1.map == tr_tbl2.map))
+             .where(tr_tbl1.player == player1, tr_tbl2.player == player2)
+             .order_by(tr_tbl1.map)).tuples()
+        results = []
+        summary = {
+            'p1_better': 0,
+            'p2_better': 0,
+            'total_gap': 0
+        }
+        times1 = {}
+        times2 = {}
+
+        for m, p1, mp, t1, p2, t2 in q:
+            if m not in times1 or times1[m] > t1:
+                times1[m] = t1
+            if m not in times2 or times2[m] > t2:
+                times2[m] = t2
+
+        for m, p1, mp, t1, p2, t2 in q:
+            if times1[m] != t1 or times2[m] != t2:
+                continue
+            if t1 < t2:
+                summary['p1_better'] += 1
+                gap = (t2 - t1) * 100 / t1
+                summary['total_gap'] += gap
+            else:
+                summary['p2_better'] += 1
+                gap = (t1 - t2) * 100 / t2
+                summary['total_gap'] -= gap
+            results.append((m, p1, mp, t1, p2, t2, gap))
+
+        return render(request, 'xdf/compare.jinja', {
+            'current_nav_tab': 'players',
+            'player1': player1,
+            'player2': player2,
+            'records': records,
+            'results': results,
+            'summary': summary
         })

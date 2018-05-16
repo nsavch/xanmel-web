@@ -47,12 +47,11 @@
         <div class="row mb-3">
             <div class="col">
                 <h4>Compare {{ player.nickname }} with</h4>
-                <form>
-                    {% csrf_token %}
-                    {{ compare_form.source_player_id }}
+                <form action="{{ url('xdf:compare') }}">
+                    {{ compare_form.player1 }}
                     <div class="row">
                         <div class="col">
-                            {{ bootstrap_field(compare_form.player, show_label=False) }}
+                            {{ bootstrap_field(compare_form.player2, show_label=False) }}
                         </div>
                         <div class="col">
                             <button class="btn btn-primary">Compare!</button>
