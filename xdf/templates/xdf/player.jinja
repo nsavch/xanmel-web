@@ -6,10 +6,11 @@
 {% block content %}
     <div class="col-md-12">
         <h1>Xonotic DeFRaG</h1>
-        <h2 class="page-header">{{ player.nickname }}</h2>
-        {% if player.stats_id %}
-            <a href="https://stats.xonotic.org/player/{{ player.stats_id }}">xonstats account</a>
-        {% endif %}
+    {% if player.stats_id %}<h4 class="text-muted float-right">
+            <a href="https://stats.xonotic.org/player/{{ player.stats_id }}">xonstats page</a>
+        {% endif %}</h4>
+        <h2 class="page-header">{{ player.nickname }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </h2>
+
         <div class="row mb-3">
             <div class="col">
                 <h3>Ladder Positions</h3>
@@ -30,11 +31,11 @@
                     {% for lp in ladder_positions %}
                         <tr>
                             <th>{% if lp.ladder.type == 0 %}Global{% else %}{{ lp.ladder.server.name }}{% endif %}</th>
-                            <td>{{ lp.position }}/{{ lp.ladder.max_position }}</td>
+                            <td>{% if lp.points == 0 %}n/a{% else %}{{ lp.position }}/{{ lp.ladder.max_position }}{% endif %}</td>
                             <td>{{ lp.points|round }}</td>
-                            <td>{{ lp.data['speed'] }}</td>
+                            <td>{{ lp.data.get('speed', 0) }}</td>
                             {% for i in ladder_columns %}
-                                <td>{{ lp.data[i] }}</td>
+                                <td>{{ lp.data.get(i, 0) }}</td>
                             {% endfor %}
                             <td>{{ count_rest(lp.data) }}</td>
                         </tr>

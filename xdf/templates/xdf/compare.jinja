@@ -8,8 +8,10 @@
         <h1>Xonotic DeFRaG</h1>
         <h2>{{ player1.nickname }} vs {{ player2.nickname }}</h2>
         <ul>
-            <li>{{ player1.nickname }} is better on <strong>{{ summary['p1_better'] }}</strong> maps</li>
-            <li>{{ player2.nickname }} is better on <strong>{{ summary['p2_better'] }}</strong> maps</li>
+            <li><a href="{{ url('xdf:player', player1.id) }}">{{ player1.nickname }}</a>
+                 is better on <strong>{{ summary['p1_better'] }}</strong> maps</li>
+            <li><a href="{{ url('xdf:player', player2.id) }}">{{ player2.nickname }}</a>
+                is better on <strong>{{ summary['p2_better'] }}</strong> maps</li>
             <li>Total gap is <strong>{{ summary['total_gap']|floatformat(0) }}%</strong></li>
         </ul>
         <table class="table table-bordered table-striped">
