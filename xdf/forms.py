@@ -92,3 +92,12 @@ class LadderFilterForm(forms.Form):
         servers = list(XDFServer.select(XDFServer.id, XDFServer.name))
         super().__init__(*args, **kwargs)
         self.fields['server'] = forms.ChoiceField(choices=[(i.id, i.name) for i in servers], required=False)
+
+
+class CompareWithForm(forms.Form):
+    source_player_id = forms.IntegerField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        players = XDFPlayer.select().order_by(XDFPlayer.nickname)
+        self.fields['player'] = forms.ChoiceField(choices=[(i.id, i.nickname) for i in players])

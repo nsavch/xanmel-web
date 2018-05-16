@@ -51,6 +51,7 @@ class Command(BaseCommand):
                         for i, lp in enumerate(positions, start=1):
                             lp.position = i
                             lp.save()
+
                     elif t == LadderType.SERVER:
                         for server in XDFServer.select():
                             ladder, _ = XDFLadder.get_or_create(algo=algo.value, type=t.value, physics=None,
@@ -84,3 +85,7 @@ class Command(BaseCommand):
                             for i, lp in enumerate(positions, start=1):
                                 lp.position = i
                                 lp.save()
+        for ladder in XDFLadder.select():
+            ladder.max_position = XDFLadderPosition.select().where(XDFLadderPosition.ladder == ladder,
+                                                                   XDFLadderPosition.points > 0).count()
+            ladder.save()

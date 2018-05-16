@@ -10,7 +10,7 @@ from peewee import fn
 from xanmel.modules.xonotic.models import *
 from xdf.templatetags.xdf import format_time
 
-from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm, LadderFilterForm
+from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm, LadderFilterForm, CompareWithForm
 from .utils import paginate_query
 
 
@@ -21,7 +21,7 @@ def format_player_with_link(player):
     )
 
 
-class IndexView(View):
+class HelpersMixin:
     @staticmethod
     def format_news_item(news_item):
         if news_item.event_type == EventType.SPEED_RECORD.value:
@@ -36,7 +36,7 @@ class IndexView(View):
                     format_time(news_item.time_record.time),
                 )
             else:
-                yt_link = '{}s'.format(format_time(news_item.time_record.time),)
+                yt_link = '{}s'.format(format_time(news_item.time_record.time), )
             return "{} set time &mdash; {} (server {}/{}, global {}/{})".format(
                 format_player_with_link(news_item.time_record.player),
                 yt_link,
@@ -45,6 +45,15 @@ class IndexView(View):
                 news_item.time_record.global_pos,
                 news_item.time_record.global_max_pos,
             )
+    @staticmethod
+    def count_rest(data):
+        res = 0
+        for i in range(11, 101):
+            res += data.get(str(i), 0)
+        return res
+
+
+class IndexView(View, HelpersMixin):
 
     def get(self, request):
         form = NewsFeedFilterForm(data=request.GET)
@@ -214,14 +223,7 @@ class MapView(View):
         })
 
 
-class ClassicLadderView(View):
-    @staticmethod
-    def count_rest(data):
-        res = 0
-        for i in range(11, 101):
-            res += data.get(str(i), 0)
-        return res
-
+class ClassicLadderView(View, HelpersMixin):
     def get(self, request):
         form = LadderFilterForm(data=request.GET)
         form.is_valid()
@@ -258,13 +260,36 @@ class ClassicLadderView(View):
         })
 
 
-class PlayerView(View):
+class PlayerView(View, HelpersMixin):
+
     def get(self, request, player_id):
         try:
             player = XDFPlayer.get(id=player_id)
         except DoesNotExist:
             raise Http404
+        compare_form = CompareWithForm(initial={'source_player_id': player.id})
+        ladder_positions = (XDFLadderPosition.select()
+                            .join(XDFLadder)
+                            .where(XDFLadderPosition.player == player)
+                            .order_by(XDFLadder.type))
+        news_items = (XDFNewsFeed.select()
+                      .join(XDFTimeRecord, JOIN_LEFT_OUTER)
+                      .switch(XDFNewsFeed)
+                      .join(XDFSpeedRecord, JOIN_LEFT_OUTER)
+                      .where((XDFTimeRecord.player == player) | (XDFSpeedRecord.player == player)))[:10]
+        ladder_columns = [str(i) for i in range(1, 11)]
+        best_records = (XDFTimeRecord.select()
+                        .where(XDFTimeRecord.player == player)
+                        .order_by(XDFTimeRecord.global_pos.asc(), XDFTimeRecord.global_max_pos.desc()))[:10]
+
         return render(request, 'xdf/player.jinja', {
             'player': player,
-            'current_nav_tab': 'players'
+            'current_nav_tab': 'players',
+            'ladder_positions': ladder_positions,
+            'news_items': news_items,
+            'ladder_columns': ladder_columns,
+            'count_rest': self.count_rest,
+            'format_news_item': self.format_news_item,
+            'best_records': best_records,
+            'compare_form': compare_form
         })

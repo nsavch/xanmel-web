@@ -29,7 +29,7 @@
             <li class="nav-item {% if current_nav_tab == 'maps' %}active{% endif %}">
                 <a class="nav-link" href="{{ url('xdf:maps') }}">Maps</a>
             </li>
-            <li class="nav-item" {% if current_nav_tab == 'players' %}active{% endif %}">
+            <li class="nav-item {% if current_nav_tab == 'players' %}active{% endif %}">
                 <a class="nav-link" href="{{ url('xdf:classic-ladder') }}">Players</a>
             </li>
 
@@ -43,7 +43,28 @@
         {% block content %}
         {% endblock %}
     </div>
+    <footer id="footer">
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="list-unstyled">
+                            <li class="float-lg-right"><a href="#top">Back to top</a></li>
+                            <li><a href="https://xonotic.org/">Xonotic Website</a></li>
+                            <li><a href="https://discord.gg/v447EHx">XDF Discord</a></li>
+                            <li><a href="http://webchat.quakenet.org/?channels=#xdf">IRC: quakenet/#xdf</a></li>
+
+                        </ul>
+                        <p>Website made by <a href="https://portal.exe.pub/xdf/players/4/">Morosophos</a>,<br>
+                            <a href="https://github.com/nsavch/xanmel-web">source code</a> available under GNU AGPL-3.0 license.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
 </div>
+
 </body>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
