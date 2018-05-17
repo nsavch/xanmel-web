@@ -87,17 +87,12 @@ class ServerDB:
                 continue
             nickname = Color.dp_to_none(v.encode('utf8')).decode('utf8')
             try:
-                nick = XDFPlayerNickname.get(XDFPlayerNickname.key == key,
-                                             XDFPlayerNickname.raw_nickname == v)
+                XDFPlayerNickname.get(XDFPlayerNickname.key == key,
+                                      XDFPlayerNickname.raw_nickname == v)
             except DoesNotExist:
                 XDFPlayerNickname.create(key=key,
                                          raw_nickname=v,
                                          nickname=nickname)
-            else:
-                if nick.key.player.raw_nickname != v:
-                    nick.key.player.raw_nickname = v
-                    nick.key.player.nickname = nickname
-                    nick.key.player.save()
             players_cache[k] = key.player
         for i in XDFSpeedRecord.select().where(XDFSpeedRecord.server == server):
             prev_speed_records[i.map] = i
@@ -106,7 +101,6 @@ class ServerDB:
         for map_name, item in self.maps.items():
             positions = {}
             max_pos = 0
-
             for k, v in item.items():
                 if not v.get('player'):
                     # Why?
@@ -117,6 +111,7 @@ class ServerDB:
                 except KeyError:
                     player = XDFPlayer.get_player(v['player'], self.uid_to_name(v['player']),
                                                   settings.XONOTIC_ELO_REQUEST_SIGNATURE)
+                check_nickname = False
                 if k == 'speed':
                     create_news = False
                     if map_name in prev_speed_records:
@@ -128,9 +123,11 @@ class ServerDB:
                             record.timestamp = current_time()
                             record.save()
                             create_news = True
+                            check_nickname = True
                     else:
                         record = XDFSpeedRecord.create(map=map_name, server=server, player=player, speed=v['speed'])
                         create_news = True
+                        check_nickname = True
 
                     if create_news:
                         XDFNewsFeed.create(event_type=EventType.SPEED_RECORD.value,
@@ -139,6 +136,10 @@ class ServerDB:
                     positions[k] = v
                     if k > max_pos:
                         max_pos = k
+                if check_nickname and player.raw_nickname != self.uid_to_name(v['player']):
+                    player.raw_nickname = self.uid_to_name(v['player'])
+                    player.nickname = Color.dp_to_none(self.uid_to_name(v['player']).encode('utf8')).decode('utf8')
+                    player.save()
             cur_shift = 0
             for pos in range(1, max_pos + 1):
                 if pos not in positions:
@@ -146,8 +147,12 @@ class ServerDB:
                     max_pos -= 1
                     cur_shift += 1
                     continue
-                player = XDFPlayer.get_player(positions[pos]['player'], self.uid_to_name(positions[pos]['player']),
-                                              settings.XONOTIC_ELO_REQUEST_SIGNATURE)
+                try:
+                    player = players_cache[positions[pos]['player']]
+                except KeyError:
+                    player = XDFPlayer.get_player(positions[pos]['player'], self.uid_to_name(positions[pos]['player']),
+                                                  settings.XONOTIC_ELO_REQUEST_SIGNATURE)
+                check_nickname = False
                 time = positions[pos]['time']
                 prev_position = prev_time_records[map_name].get(player.id)
                 real_pos = pos - cur_shift
@@ -156,6 +161,7 @@ class ServerDB:
                     if prev_position.time > time:
                         # Time improvement
                         create_news = True
+                        check_nickname = True
                         prev_position.timestamp = current_time()
                         changed_maps.add(map_name)
                     elif prev_position.time == time and prev_position.server_pos == real_pos:
@@ -176,12 +182,17 @@ class ServerDB:
                 else:
                     # New time record
                     create_news = True
+                    check_nickname = True
                     changed_maps.add(map_name)
                     record = XDFTimeRecord.create(map=map_name, server=server, player=player, server_pos=real_pos,
                                                   time=time)
                 if create_news:
                     XDFNewsFeed.create(event_type=EventType.TIME_RECORD.value,
                                        time_record=record)
+                if check_nickname and player.raw_nickname != self.uid_to_name(positions[pos]['player']):
+                    player.raw_nickname = self.uid_to_name(positions[pos]['player'])
+                    player.nickname = Color.dp_to_none(self.uid_to_name(positions[pos]['player']).encode('utf8')).decode('utf8')
+                    player.save()
             for i in XDFTimeRecord.select().where(XDFTimeRecord.server == server,
                                                   XDFTimeRecord.map == map_name,
                                                   XDFTimeRecord.server_pos > max_pos):
