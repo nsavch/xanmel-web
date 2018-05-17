@@ -20,7 +20,7 @@ urlpatterns = [
     url(r'', include('map_rating.urls', namespace='map_rating')),
     url(r'xdf/', include('xdf.urls', namespace='xdf')),
     url(r'sorm/', include('sorm.urls', namespace='sorm')),
-    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.jinja')),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(template_name='login.jinja'), name='login'),
     url(r'^accounts/logout/$', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
 
 ]
