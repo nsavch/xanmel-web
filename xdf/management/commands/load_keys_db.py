@@ -19,7 +19,7 @@ class Command(BaseCommand):
         with open(fn, 'r') as f:
             for line in f.readlines():
                 old, current = line.strip().split(' ')
-                prefix = '/uid2name/'
+                prefix = ''
                 old = old[len(prefix):]
                 current = current[len(prefix):]
                 try:
@@ -87,4 +87,4 @@ class Command(BaseCommand):
                     XDFPlayerKey.get(XDFPlayerKey.player == i)
                 except DoesNotExist:
                     print('Removing player with no keys {}'.format(i.nickname))
-                    i.delete_instance()
+                    i.delete_instance(recursive=True)
