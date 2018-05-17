@@ -233,17 +233,25 @@ class ClassicLadderView(View, HelpersMixin):
         players = form.cleaned_data['players']
 
         if t == LadderType.GLOBAL.value:
+            try:
+                ladder = XDFLadder.get(XDFLadder.algo == LadderAlgo.CLASSIC.value,
+                                       XDFLadder.type == LadderType.GLOBAL.value)
+            except DoesNotExist:
+                raise Http404()
             positions = (XDFLadderPosition.select()
-                         .join(XDFLadder)
-                         .where(XDFLadder.algo == LadderAlgo.CLASSIC.value,
-                                XDFLadder.type == LadderType.GLOBAL.value)
+
+                         .where(XDFLadderPosition.ladder == ladder)
                          .order_by(XDFLadderPosition.position))
         else:
+            try:
+                ladder = XDFLadder.get(XDFLadder.algo == LadderAlgo.CLASSIC.value,
+                                       XDFLadder.type == LadderType.SERVER.value,
+                                       XDFLadder.server == s)
+            except DoesNotExist:
+                raise Http404
             positions = (XDFLadderPosition.select()
                          .join(XDFLadder)
-                         .where(XDFLadder.algo == LadderAlgo.CLASSIC.value,
-                                XDFLadder.type == LadderType.SERVER.value,
-                                XDFLadder.server == s)
+                         .where(XDFLadderPosition.ladder == ladder)
                          .order_by(XDFLadderPosition.position))
         if players:
             positions = positions.switch(XDFLadderPosition).join(XDFPlayer).where(
@@ -254,6 +262,7 @@ class ClassicLadderView(View, HelpersMixin):
 
         return render(request, 'xdf/ladder_classic.jinja', {
             'current_nav_tab': 'players',
+            'ladder': ladder,
             'positions': positions,
             'columns': columns,
             'total_positions': total_positions,

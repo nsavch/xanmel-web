@@ -88,4 +88,5 @@ class Command(BaseCommand):
         for ladder in XDFLadder.select():
             ladder.max_position = XDFLadderPosition.select().where(XDFLadderPosition.ladder == ladder,
                                                                    XDFLadderPosition.points > 0).count()
+            ladder.timestamp = current_time()
             ladder.save()
