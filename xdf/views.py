@@ -292,6 +292,7 @@ class PlayerView(View, HelpersMixin):
         best_records = (XDFTimeRecord.select()
                         .where(XDFTimeRecord.player == player)
                         .order_by(XDFTimeRecord.global_pos.asc(), XDFTimeRecord.global_max_pos.desc()))[:10]
+        keys = XDFPlayerKey.select().where(XDFPlayerKey.player == player)
 
         return render(request, 'xdf/player.jinja', {
             'player': player,
@@ -302,7 +303,8 @@ class PlayerView(View, HelpersMixin):
             'count_rest': self.count_rest,
             'format_news_item': self.format_news_item,
             'best_records': best_records,
-            'compare_form': compare_form
+            'compare_form': compare_form,
+            'keys': keys
         })
 
 

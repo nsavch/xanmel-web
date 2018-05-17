@@ -6,10 +6,31 @@
 {% block content %}
     <div class="col-md-12">
         <h1>Xonotic DeFRaG</h1>
-    {% if player.stats_id %}<h4 class="text-muted float-right">
+        {% if player.stats_id %}<h4 class="text-muted float-right">
             <a href="https://stats.xonotic.org/player/{{ player.stats_id }}">xonstats page</a>
         {% endif %}</h4>
-        <h2 class="page-header">{{ player.nickname }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </h2>
+        <h2 class="page-header">{{ player.nickname }}</h2>
+        {% if request.user.is_superuser %}
+            <div class="row mb-3">
+                <div class="col-lg-6 col-md-7 col-sm-9 col-12">
+                    <h3>KEYS</h3>
+
+                    <ul class="list-group">
+                        {% for i in keys %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <code>{{ i.crypto_idfp }}</code>
+                                <span class="badge badge-primary badge-pill">
+                                    <a href="{{ url('sorm:search_key', i.crypto_idfp) }}">SORM</a>
+                                </span>
+                            </li>
+
+                        {% endfor %}
+
+                    </ul>
+                </div>
+            </div>
+
+        {% endif %}
 
         <div class="row mb-3">
             <div class="col">
@@ -31,7 +52,8 @@
                     {% for lp in ladder_positions %}
                         <tr>
                             <th>{% if lp.ladder.type == 0 %}Global{% else %}{{ lp.ladder.server.name }}{% endif %}</th>
-                            <td>{% if lp.points == 0 %}n/a{% else %}{{ lp.position }}/{{ lp.ladder.max_position }}{% endif %}</td>
+                            <td>{% if lp.points == 0 %}n/a{% else %}{{ lp.position }}/
+                                {{ lp.ladder.max_position }}{% endif %}</td>
                             <td>{{ lp.points|round }}</td>
                             <td>{{ lp.data.get('speed', 0) }}</td>
                             {% for i in ladder_columns %}

@@ -4,6 +4,7 @@ import maya
 from bootstrap4.forms import render_field
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_jinja import library
 
@@ -56,3 +57,9 @@ def render_pagination(request, total):
 @library.global_function
 def urlquote(s):
     return urllib.parse.quote(s)
+
+
+@library.global_function
+def login_url(request):
+    return_url = request.path
+    return reverse('login') + '?next={}'.format(return_url)

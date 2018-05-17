@@ -1,16 +1,17 @@
 {% extends "base.jinja" %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
     <style>
-    #map {
-        height: 400px;
-    }
-    td.search {
-        /*font-size: 150%;
-        padding-top: 4px !important; */
-    }
+        #map {
+            height: 400px;
+        }
+
+        td.search {
+            /*font-size: 150%;
+            padding-top: 4px !important; */
+        }
     </style>
 {% endblock %}
 
@@ -20,58 +21,65 @@
         <div class="col-md-6">
             <h2>Analyze identity</h2>
             <a href="{{ url('sorm:identity-list') }}">Back to SORM index</a>
-            <h3>{{ identity.nickname }}<br><small>{{ identity.server.name }}@{{ identity.timestamp }}</small></h3>
-            <table class="table">
+            {% if identity %}
+                <h3>{{ identity.nickname }}<br>
+                    <small>{{ identity.server.name }}@{{ identity.timestamp }}</small>
+                </h3>
+                <table class="table">
 
-                <tr>
-                    <th>Crypto IDFP</th>
-                    <td>{{ identity.crypto_idfp }}</td>
-                    <td class="search"><a class="btn btn-primary" href="?search=crypto_idfp"><i
-                            class="fa fa-search"></i></a></td>
-                </tr>
-                <tr>
-                    <th>Xonstats</th>
-                    <td>
-                        {% if identity.stats_id %}
-                            <a href="http://stats.xonotic.org/player/{{ identity.stats_id }}">{{ identity.stats_id }}</a>
-                        {% endif %}
-                    </td>
-                    <td class="search"><a class="btn btn-primary" href="?search=stats_id"><i
-                            class="fa fa-search"></i></a></td>
-                </tr>
-                <tr>
-                    <th>Raw Nickname</th>
-                    <td>{{ identity.raw_nickname }}</td>
-                    <td class="search"><a class="btn btn-primary" href="?search=raw_nickname"><i
-                            class="fa fa-search"></i></a></td>
-                </tr>
+                    <tr>
+                        <th>Crypto IDFP</th>
+                        <td>{{ identity.crypto_idfp }}</td>
+                        <td class="search"><a class="btn btn-primary" href="?search=crypto_idfp"><i
+                                class="fa fa-search"></i></a></td>
+                    </tr>
+                    <tr>
+                        <th>Xonstats</th>
+                        <td>
+                            {% if identity.stats_id %}
+                                <a href="http://stats.xonotic.org/player/{{ identity.stats_id }}">{{ identity.stats_id }}</a>
+                            {% endif %}
+                        </td>
+                        <td class="search"><a class="btn btn-primary" href="?search=stats_id"><i
+                                class="fa fa-search"></i></a></td>
+                    </tr>
+                    <tr>
+                        <th>Raw Nickname</th>
+                        <td>{{ identity.raw_nickname }}</td>
+                        <td class="search"><a class="btn btn-primary" href="?search=raw_nickname"><i
+                                class="fa fa-search"></i></a></td>
+                    </tr>
 
-                <tr>
-                    <th>IP</th>
-                    <td>{{ identity.ip_address }}</td>
-                    <td class="search"><a class="btn btn-primary" href="?search=ip_address"><i class="fa fa-search"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Geolocation</th>
-                    <td>{{ identity.to_key().full_geoloc() }}</td>
-                    <td class="search"><a class="btn btn-primary" href="?search=geoloc"><i class="fa fa-search"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <th><abbr title="Autotomous System Number">ASN</abbr></th>
-                    <td>{{ identity.asn }}: {{ identity.asn_cidr }} ({{ identity.asn_country_code }})</td>
-                    <td class="search"><a class="btn btn-primary" href="?search=asn"><i class="fa fa-search"></i></a>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Network</th>
-                    <td>{{ identity.network_name }}: {{ identity.network_cidr }} ({{ identity.network_country_code }})
-                    </td>
-                    <td class="search"><a class="btn btn-primary" href="?search=network"><i
-                            class="fa fa-search"></i></a></td>
-                </tr>
-            </table>
+                    <tr>
+                        <th>IP</th>
+                        <td>{{ identity.ip_address }}</td>
+                        <td class="search"><a class="btn btn-primary" href="?search=ip_address"><i
+                                class="fa fa-search"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Geolocation</th>
+                        <td>{{ identity.to_key().full_geoloc() }}</td>
+                        <td class="search"><a class="btn btn-primary" href="?search=geoloc"><i class="fa fa-search"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><abbr title="Autotomous System Number">ASN</abbr></th>
+                        <td>{{ identity.asn }}: {{ identity.asn_cidr }} ({{ identity.asn_country_code }})</td>
+                        <td class="search"><a class="btn btn-primary" href="?search=asn"><i
+                                class="fa fa-search"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Network</th>
+                        <td>{{ identity.network_name }}: {{ identity.network_cidr }}
+                            ({{ identity.network_country_code }})
+                        </td>
+                        <td class="search"><a class="btn btn-primary" href="?search=network"><i
+                                class="fa fa-search"></i></a></td>
+                    </tr>
+                </table>
+            {% endif %}
             {% if identities %}
                 <h3>Search results</h3>
                 <table class="table table-bordered">
@@ -123,14 +131,14 @@
             markers.push(marker);
             marker.bindPopup('{{ identity.nickname }}: {{ identity.to_key().full_geoloc() }}').addTo(map);
         {% endif %}
-    {% for key, value in identities %}
+        {% for key, value in identities %}
             {% for latitude, longitude in value.geo %}
                 marker = L.marker([{{ latitude }}, {{ longitude }}], {riseOnHover: true});
                 markers.push(marker);
                 marker.addTo(map).bindPopup('{{ value['nickname'] }}: {{ key.full_geoloc() }}');
             {% endfor %}
         {% endfor %}
-    var group = new L.featureGroup(markers);
+        var group = new L.featureGroup(markers);
         map.fitBounds(group.getBounds(), {maxZoom: 5});
 
     </script>

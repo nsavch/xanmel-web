@@ -106,3 +106,20 @@ def identity_details(request, identity_id):
         'identity': identity,
         'identities': identities
     })
+
+
+@permission_required('can_access_sorm')
+def search_key(request, crypto_idfp):
+    raw_identities = PlayerIdentification.select().where(
+        PlayerIdentification.crypto_idfp == crypto_idfp).order_by(PlayerIdentification.timestamp.desc())
+    identities = IdentityList()
+    for i in raw_identities:
+        identities.add_identity(i)
+    if raw_identities.count() > 0:
+        identity = raw_identities[0]
+    else:
+        identity = None
+    return render(request, 'sorm/identity_details.jinja', {
+        'identity': identity,
+        'identities': identities
+    })

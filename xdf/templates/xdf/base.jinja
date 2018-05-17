@@ -50,6 +50,11 @@
                     <div class="card-body">
                         <ul class="list-unstyled">
                             <li class="float-lg-right"><a href="#top">Back to top</a></li>
+                            {% if request.user.is_anonymous %}
+                                <li><a href="{{ login_url(request) }}">Login</a></li>
+                            {% else %}
+                                <li><a href="{{ url('logout') }}">Logout</a></li>
+                            {% endif %}
                             <li><a href="https://xonotic.org/">Xonotic Website</a></li>
                             <li><a href="https://discord.gg/v447EHx">XDF Discord</a></li>
                             <li><a href="http://webchat.quakenet.org/?channels=#xdf">IRC: quakenet/#xdf</a></li>
