@@ -121,7 +121,8 @@
                         </tr>
                     {% endfor %}
                 </table>
-                <a href="{{ url('xdf:player-records', player.id) }}">Browse all records by {{ player.nickname }}</a>
+                <a href="{{ url('xdf:player-speed-records', player.id) }}">Speed records by {{ player.nickname }}</a><br>
+                <a href="{{ url('xdf:player-time-records', player.id) }}">Time records by {{ player.nickname }}</a>
             </div>
         </div>
     </div>

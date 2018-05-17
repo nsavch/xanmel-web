@@ -1,4 +1,5 @@
 import urllib.parse
+from collections import OrderedDict
 
 from django.http import Http404, HttpResponseBadRequest
 from django.shortcuts import render
@@ -409,13 +410,38 @@ class PlayerActivityView(View):
         })
 
 
-class PlayerRecordsView(View):
+class PlayerSpeedRecordsView(View):
     def get(self, request, player_id):
         try:
             player = XDFPlayer.get(id=player_id)
         except DoesNotExist:
             raise Http404
-        return render(request, 'xdf/player_records.jinja', {
+        records = OrderedDict()
+        raw_records = (XDFSpeedRecord.select()
+                       .where(XDFSpeedRecord.player == player)
+                       .order_by(XDFSpeedRecord.map))
+        for i in raw_records:
+            if i.map not in records or records[i.map].speed < i.speed:
+                records[i.map] = i
+
+        return render(request, 'xdf/player_speed_records.jinja', {
             'current_nav_tab': 'players',
-            'player': player
+            'player': player,
+            'records': records
+        })
+
+
+class PlayerTimeRecordsView(View):
+    def get(self, request, player_id):
+        try:
+            player = XDFPlayer.get(id=player_id)
+        except DoesNotExist:
+            raise Http404
+        records = (XDFTimeRecord.select()
+                   .where(XDFTimeRecord.player == player)
+                   .order_by(XDFTimeRecord.map))
+        return render(request, 'xdf/player_time_records.jinja', {
+            'current_nav_tab': 'players',
+            'player': player,
+            'records': records
         })

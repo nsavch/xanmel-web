@@ -6,7 +6,7 @@
 {% block content %}
     <div class="col-md-12">
         <h1>Xonotic DeFRaG</h1>
-        <h2>Activity of {{ player.nickname }}</h2>
+        <h2>Activity of <a href="{{ url('xdf:player', player.id) }}">{{ player.nickname }}</a></h2>
         <form>
             <div class="row">
                 <div class="col">
