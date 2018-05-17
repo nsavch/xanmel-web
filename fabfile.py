@@ -4,7 +4,7 @@ from fabric.api import *
 env.hosts = ['xon.teichisma.info']
 env.user = 'root'
 local_user = 'xanmel'
-local_home = '/home/xanmel/xanmel'
+local_home = '/home/xanmel'
 app_path = '/home/xanmel/xanmel-web'
 venv_path = '/home/xanmel/venvs/xanmel-web'
 
@@ -19,7 +19,6 @@ def install_requirements():
         sudo('HOME=%s pipenv install' % (local_home, ), user=local_user)
     with cd('/home/xanmel/xanmel'):
         sudo('HOME=%s git pull' % local_home)
-        sudo('HOME=%s %s/bin/python setup.py install' % (local_home, venv_path), user=local_user)
 
 
 def update_systemd():

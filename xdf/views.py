@@ -287,7 +287,8 @@ class PlayerView(View, HelpersMixin):
                       .join(XDFTimeRecord, JOIN_LEFT_OUTER)
                       .switch(XDFNewsFeed)
                       .join(XDFSpeedRecord, JOIN_LEFT_OUTER)
-                      .where((XDFTimeRecord.player == player) | (XDFSpeedRecord.player == player)))[:10]
+                      .where((XDFTimeRecord.player == player) | (XDFSpeedRecord.player == player))
+                      .order_by(XDFNewsFeed.timestamp.desc()))[:10]
         ladder_columns = [str(i) for i in range(1, 11)]
         best_records = (XDFTimeRecord.select()
                         .where(XDFTimeRecord.player == player)
@@ -372,4 +373,49 @@ class CompareView(View):
             'records': records,
             'results': results,
             'summary': summary
+        })
+
+
+class PlayerActivityView(View):
+    def get(self, request, player_id):
+        try:
+            player = XDFPlayer.get(id=player_id)
+        except DoesNotExist:
+            raise Http404
+        form = NewsFeedFilterForm(data=request.GET)
+        form.is_valid()
+        news_items = (XDFNewsFeed.select()
+                      .join(XDFTimeRecord, JOIN_LEFT_OUTER)
+                      .switch(XDFNewsFeed)
+                      .join(XDFSpeedRecord, JOIN_LEFT_OUTER)
+                      .where((XDFTimeRecord.player == player) | (XDFSpeedRecord.player == player))
+                      .order_by(XDFNewsFeed.timestamp.desc()))
+        if form.cleaned_data['maps']:
+            pattern = '%{}%'.format(form.cleaned_data['maps'])
+            news_items = news_items.where(XDFTimeRecord.map ** pattern | XDFSpeedRecord.map ** pattern)
+        servers = form.cleaned_data['servers']
+        news_items = news_items.where(XDFTimeRecord.server.in_(servers) | XDFSpeedRecord.server.in_(servers))
+        news_items = news_items.where(XDFNewsFeed.event_type.in_(form.cleaned_data['event_types']))
+        if form.cleaned_data['position_lte']:
+            news_items = news_items.where(XDFTimeRecord.server_pos <= form.cleaned_data['position_lte'])
+        total_news_items = news_items.count()
+        news_items = paginate_query(request, news_items)
+        return render(request, 'xdf/player_activity.jinja', {
+            'current_nav_tab': 'players',
+            'player': player,
+            'news_items': news_items,
+            'total_news_items': total_news_items,
+            'form': form
+        })
+
+
+class PlayerRecordsView(View):
+    def get(self, request, player_id):
+        try:
+            player = XDFPlayer.get(id=player_id)
+        except DoesNotExist:
+            raise Http404
+        return render(request, 'xdf/player_records.jinja', {
+            'current_nav_tab': 'players',
+            'player': player
         })

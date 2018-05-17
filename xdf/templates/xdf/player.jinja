@@ -108,7 +108,7 @@
                         </tr>
                     {% endfor %}
                 </table>
-                <a href="#">View all activity of {{ player.nickname }}</a>
+                <a href="{{ url('xdf:player-activity', player.id) }}">View all activity of {{ player.nickname }}</a>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-12 col-12">
                 <h3>Favourite Maps</h3>
@@ -121,7 +121,7 @@
                         </tr>
                     {% endfor %}
                 </table>
-                <a href="#">Browse all records by {{ player.nickname }}</a>
+                <a href="{{ url('xdf:player-records', player.id) }}">Browse all records by {{ player.nickname }}</a>
             </div>
         </div>
     </div>

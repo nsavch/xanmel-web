@@ -1,0 +1,57 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}Activity of {{ player.nickname }} - Xonotic DeFRaG{% endblock %}
+
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2>Activity of {{ player.nickname }}</h2>
+        <form>
+            <div class="row">
+                <div class="col">
+                    {{ bootstrap_field(form.maps, show_label=False) }}
+                </div>
+                <div class="col">
+                    {{ bootstrap_field(form.servers, show_label=False) }}
+                </div>
+                <div class="col">
+                    {{ bootstrap_field(form.event_types, show_label=False) }}
+                </div>
+                <div class="col">
+                    {{ bootstrap_field(form.position_lte, show_label=False) }}
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary">refresh</button>
+                </div>
+            </div>
+        </form>
+        <table class="table table-bordered table-striped">
+            {% for i in news_items %}
+                <tr>
+                    {% if i.event_type == 1 %}
+                        <th>
+                            <a href="{{ url('xdf:map', urlquote(i.speed_record.map)) }}">{{ i.speed_record.map }}</a>
+                        </th>
+                        <td>{{ format_timestamp(i.timestamp) }}</td>
+
+                        <th>Speed</th>
+                        <td colspan="2">{{ i.speed_record.speed|round }}qu/s</td>
+                    {% else %}
+                        <th>
+                            <a href="{{ url('xdf:map', urlquote(i.time_record.map)) }}">{{ i.time_record.map }}</a>
+                        </th>
+                        <td>{{ format_timestamp(i.timestamp) }}</td>
+
+                        <th>Time</th>
+
+                        <td>{{ i.time_record.global_pos }}/ {{ i.time_record.global_max_pos }}</td>
+                        <td>{{ format_time(i.time_record.time) }}s</td>
+                    {% endif %}
+
+                </tr>
+            {% endfor %}
+        </table>
+        {{ render_pagination(request, total_news_items) }}
+    </div>
+{% endblock %}
