@@ -12,7 +12,7 @@ from xanmel.modules.xonotic.models import *
 from xdf.templatetags.xdf import format_time
 
 from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm, LadderFilterForm, CompareWithForm, \
-    SearchPlayerForm, SearchType
+    SearchPlayerForm, SearchType, PlayerRecordSearchForm
 from .utils import paginate_query
 
 
@@ -438,13 +438,27 @@ class PlayerTimeRecordsView(View):
             player = XDFPlayer.get(id=player_id)
         except DoesNotExist:
             raise Http404
+        form = PlayerRecordSearchForm(data=request.GET)
+        form.is_valid()
         records = (XDFTimeRecord.select()
-                   .where(XDFTimeRecord.player == player)
+                   .where(XDFTimeRecord.player == player,
+                          XDFTimeRecord.server.in_(form.cleaned_data['servers']))
                    .order_by(XDFTimeRecord.map))
+        cd = form.cleaned_data
+        if cd['maps']:
+            records = records.where(XDFTimeRecord.map ** '%{}%'.format(cd['maps']))
+        if cd['position_gte']:
+            records = records.where(XDFTimeRecord.server_pos >= cd['position_gte'])
+        if cd['position_lte']:
+            records = records.where(XDFTimeRecord.server_pos <= cd['position_lte'])
+        total_records = records.count()
+        records = paginate_query(request, records)
         return render(request, 'xdf/player_time_records.jinja', {
             'current_nav_tab': 'players',
             'player': player,
-            'records': records
+            'records': records,
+            'form': form,
+            'total_records': total_records
         })
 
 

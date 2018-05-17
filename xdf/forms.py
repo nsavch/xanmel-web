@@ -94,6 +94,13 @@ class LadderFilterForm(forms.Form):
         self.fields['server'] = forms.ChoiceField(choices=[(i.id, i.name) for i in servers], required=False)
 
 
+class PlayerRecordSearchForm(MapListFilterForm):
+    position_gte = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'position >='}),
+                                      required=False)
+    position_lte = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'position <='}),
+                                      required=False)
+
+
 class CompareWithForm(forms.Form):
     player1 = forms.IntegerField(widget=forms.HiddenInput())
 
