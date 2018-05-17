@@ -101,3 +101,14 @@ class CompareWithForm(forms.Form):
         super().__init__(*args, **kwargs)
         players = XDFPlayer.select().order_by(XDFPlayer.nickname)
         self.fields['player2'] = forms.ChoiceField(choices=[(i.id, i.nickname) for i in players])
+
+
+class SearchType(EChoice):
+    CRYPTO_IDFP = ('crypto_idfp', 'Crypto IDFP')
+    STATS_ID = ('stats_id', 'Xonstats ID')
+    NICKNAME = ('nickname', 'Nickname')
+
+
+class SearchPlayerForm(forms.Form):
+    query = forms.CharField()
+    query_type = forms.ChoiceField(choices=SearchType.choices())

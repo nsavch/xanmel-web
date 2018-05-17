@@ -1,0 +1,24 @@
+{% extends "xdf/base.jinja" %}
+
+{% block title %}Search Players - Xonotic DeFRaG{% endblock %}
+
+
+{% block content %}
+    <div class="col-md-12">
+        <h1>Xonotic DeFRaG</h1>
+        <h2>Search Players</h2>
+    <form class="mb-5">
+        {{ bootstrap_field(form.query, layout='horizontal') }}
+        {{ bootstrap_field(form.query_type, layout='horizontal') }}
+        <button class="btn btn-primary">Search</button>
+    </form>
+    {% if searched %}
+        <p>Found {{ players|length }} results</p>
+        <ul>
+        {% for i in players %}
+        <li><a href="{{ url('xdf:player', i.id) }}">{{ i.nickname }}</a></li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    </div>
+{% endblock %}

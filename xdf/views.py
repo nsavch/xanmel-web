@@ -11,7 +11,8 @@ from peewee import fn
 from xanmel.modules.xonotic.models import *
 from xdf.templatetags.xdf import format_time
 
-from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm, LadderFilterForm, CompareWithForm
+from .forms import NewsFeedFilterForm, MapListFilterForm, MapFilterForm, LadderFilterForm, CompareWithForm, \
+    SearchPlayerForm, SearchType
 from .utils import paginate_query
 
 
@@ -444,4 +445,37 @@ class PlayerTimeRecordsView(View):
             'current_nav_tab': 'players',
             'player': player,
             'records': records
+        })
+
+
+class AdvancedPlayerSearchView(View):
+    def get(self, request):
+        players = None
+        searched = False
+        if request.GET:
+            form = SearchPlayerForm(request.GET)
+            players = XDFPlayer.select().join(XDFPlayerKey).join(XDFPlayerNickname)
+            if form.is_valid():
+                searched = True
+                qt = form.cleaned_data['query_type']
+                q = form.cleaned_data['query']
+                pattern = '%{}%'.format(q)
+                if qt == SearchType.CRYPTO_IDFP.value:
+                    players = players.where(XDFPlayerKey.crypto_idfp ** pattern)
+                elif qt == SearchType.STATS_ID.value:
+                    players = players.where(XDFPlayer.stats_id == q)
+                else:
+                    players = players.where(
+                        XDFPlayerNickname.nickname ** pattern | XDFPlayerNickname.raw_nickname ** pattern)
+                players = set(players)
+                players = sorted(list(players), key=lambda x: x.nickname)
+
+        else:
+            form = SearchPlayerForm()
+
+        return render(request, 'xdf/player_search.jinja', {
+            'current_nav_tab': 'players',
+            'form': form,
+            'players': players,
+            'searched': searched
         })
