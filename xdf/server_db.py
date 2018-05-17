@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 class ServerDB:
     def __init__(self):
         self.maps = defaultdict(dict)
+        self.players = {}
 
     def uid_to_name(self, crypto_idfp):
         return self.db.get('/uid2name/' + crypto_idfp, 'Unregistered player')
@@ -38,6 +39,7 @@ class ServerDB:
         position_re = re.compile('(.*)/cts100record/crypto_idfp(\d+)')
         speed_id_re = re.compile('(.*)/cts100record/speed/crypto_idfp')
         speed_value_re = re.compile('(.*)/cts100record/speed/speed')
+        uid2name_re = re.compile('/uid2name/(.*)')
         for k, v in cls.db.filter(time_re, is_regex=True):
             time = int(v)
             match = time_re.match(k)
@@ -69,11 +71,34 @@ class ServerDB:
                 logger.warning('I have player id for position %s on %s but no time!', pos, map_name)
                 continue
             inst.maps[map_name][pos]['player'] = v
+        for k, v in cls.db.filter(uid2name_re, is_regex=True):
+            match = uid2name_re.match(k)
+            inst.players[match.group(1)] = v
         return inst
 
     def save(self, server_id):
         server = XDFServer.get(id=server_id)
         prev_speed_records = {}
+        players_cache = {}
+        for k, v in self.players.items():
+            try:
+                key = XDFPlayerKey.get(crypto_idfp=k)
+            except DoesNotExist:
+                continue
+            nickname = Color.dp_to_none(v.encode('utf8')).decode('utf8')
+            try:
+                nick = XDFPlayerNickname.get(XDFPlayerNickname.key == key,
+                                             XDFPlayerNickname.raw_nickname == v)
+            except DoesNotExist:
+                XDFPlayerNickname.create(key=key,
+                                         raw_nickname=v,
+                                         nickname=nickname)
+            else:
+                if nick.key.player.raw_nickname != v:
+                    nick.key.player.raw_nickname = v
+                    nick.key.player.nickname = nickname
+                    nick.key.player.save()
+            players_cache[k] = key.player
         for i in XDFSpeedRecord.select().where(XDFSpeedRecord.server == server):
             prev_speed_records[i.map] = i
         changed_maps = set()
@@ -87,8 +112,11 @@ class ServerDB:
                     # Why?
                     print(k, v)
                     continue
-                player = XDFPlayer.get_player(v['player'], self.uid_to_name(v['player']),
-                                              settings.XONOTIC_ELO_REQUEST_SIGNATURE)
+                try:
+                    player = players_cache[v['player']]
+                except KeyError:
+                    player = XDFPlayer.get_player(v['player'], self.uid_to_name(v['player']),
+                                                  settings.XONOTIC_ELO_REQUEST_SIGNATURE)
                 if k == 'speed':
                     create_news = False
                     if map_name in prev_speed_records:

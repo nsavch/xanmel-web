@@ -12,21 +12,30 @@
         <h2 class="page-header">{{ player.nickname }}</h2>
         {% if request.user.is_superuser %}
             <div class="row mb-3">
-                <div class="col-lg-6 col-md-7 col-sm-9 col-12">
+                <div class="col-12">
                     <h3>KEYS</h3>
 
-                    <ul class="list-group">
+                    <div class="list-group">
                         {% for i in keys %}
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <code>{{ i.crypto_idfp }}</code>
-                                <span class="badge badge-primary badge-pill">
+                            <div href="#"
+                               class="list-group-item flex-column align-items-start">
+                                <span class="badge badge-primary badge-pill float-right">
                                     <a href="{{ url('sorm:search_key', i.crypto_idfp) }}">SORM</a>
                                 </span>
-                            </li>
+                                <div class="d-flex justify-content-between">
+                                    <h5 class="mb-1"><code>{{ i.crypto_idfp }}</code></h5>
+                                </div>
+                                <ul style="padding: 0; margin: 0;">
+                                    {% for n in i.nicknames %}
+                                        {{ n.nickname }}
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
 
                         {% endfor %}
 
-                    </ul>
+                    </div>
                 </div>
             </div>
 
@@ -121,7 +130,8 @@
                         </tr>
                     {% endfor %}
                 </table>
-                <a href="{{ url('xdf:player-speed-records', player.id) }}">Speed records by {{ player.nickname }}</a><br>
+                <a href="{{ url('xdf:player-speed-records', player.id) }}">Speed records
+                    by {{ player.nickname }}</a><br>
                 <a href="{{ url('xdf:player-time-records', player.id) }}">Time records by {{ player.nickname }}</a>
             </div>
         </div>
