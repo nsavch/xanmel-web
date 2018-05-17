@@ -28,7 +28,7 @@
                     {% for i in speed_records %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td><a href="{{ url('xdf:player', i.id) }}">{{ i.player.nickname }}</a></td>
+                            <td><a href="{{ url('xdf:player', i.player.id) }}">{{ i.player.nickname }}</a></td>
                             <td>{{ i.speed|round }}qu/s</td>
                             <td style="white-space:nowrap">{{ i.server.name }}</td>
                         </tr>
