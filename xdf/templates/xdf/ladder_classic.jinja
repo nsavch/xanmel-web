@@ -25,7 +25,9 @@
                 </div>
             </div>
         </form>
-        <p>Updated {{ format_timestamp(ladder.timestamp) }}</p>
+        {% if ladder.timestamp %}
+            <p>Updated {{ format_timestamp(ladder.timestamp) }}</p>
+        {% endif %}
         <table class="table table-bordered table-striped">
             <thead>
             <tr>
