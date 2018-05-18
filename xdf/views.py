@@ -131,6 +131,7 @@ class MapListView(View):
         for i in q.dicts():
             if i['speed'] > top_speed:
                 record = i
+                top_speed = i['speed']
         return record
 
     def get_time_record(self, servers, map_name):
