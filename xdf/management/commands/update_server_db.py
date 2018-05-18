@@ -12,11 +12,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         XanmelDB(settings.XANMEL_CONFIG['settings']['db_url'])
         changed_maps = set()
-        for server_id in settings.XONOTIC_XDF_DATABASES:
-            print('Processing server', server_id)
-            sdb = ServerDB.parse_server(server_id)
-            changed_maps = changed_maps.union(sdb.save(server_id))
-            sdb.pull_video(server_id)
+        for server in XDFServer.select().where(XDFServer.server_db_path.is_null(False)):
+            print('Processing server', server.name)
+            sdb = ServerDB.parse_server(server)
+            changed_maps = changed_maps.union(sdb.save(server))
+            sdb.pull_video(server)
         print(changed_maps)
         print('Updating global pos')
         XDFTimeRecord.update_global_physics_pos(changed_maps)

@@ -50,6 +50,7 @@ django-echoices = "*"
 python-xonotic-db = "*"
 maya = "*"
 "django-bootstrap4" = "*"
+raven = "*"
 
 [dev-packages]
 "fabric3" = "*"

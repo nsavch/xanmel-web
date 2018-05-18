@@ -22,8 +22,8 @@ class ServerDB:
         return self.db.get('/uid2name/' + crypto_idfp, 'Unregistered player')
 
     @classmethod
-    def parse_server(cls, server_id):
-        path = settings.XONOTIC_XDF_DATABASES[server_id]
+    def parse_server(cls, server):
+        path = server.server_db_path
         if path.startswith('http'):
             data = requests.get(path).text
         else:
@@ -76,8 +76,7 @@ class ServerDB:
             inst.players[match.group(1)] = v
         return inst
 
-    def save(self, server_id):
-        server = XDFServer.get(id=server_id)
+    def save(self, server):
         prev_speed_records = {}
         players_cache = {}
         for k, v in self.players.items():
@@ -201,11 +200,10 @@ class ServerDB:
                                                                XDFTimeRecord.map == map_name).execute()
         return changed_maps
 
-    def pull_video(self, server_id):
-        url = settings.XONOTIC_XDF_VIDEO_DATABASES.get(server_id)
+    def pull_video(self, server):
+        url = server.youtube_db_path
         if url is None:
             return
-        server = XDFServer.get(id=server_id)
         data = requests.get(url).text
         for line in data.split('\n'):
             if line:
