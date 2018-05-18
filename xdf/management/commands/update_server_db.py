@@ -19,6 +19,6 @@ class Command(BaseCommand):
             sdb.pull_video(server)
         print(changed_maps)
         print('Updating global pos')
-        XDFTimeRecord.update_global_physics_pos(changed_maps)
+        # XDFTimeRecord.update_global_physics_pos(changed_maps)
         XDFTimeRecord.update_global_pos(changed_maps)
 
