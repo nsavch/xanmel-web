@@ -213,7 +213,7 @@ class MapView(View):
         time_records = (XDFTimeRecord.select()
                         .where(XDFTimeRecord.map == map_name)
                         .where(XDFTimeRecord.server.in_(servers))
-                        .order_by(XDFTimeRecord.time, XDFTimeRecord.server_pos))
+                        .order_by(XDFTimeRecord.time, XDFTimeRecord.server_pos, SQL('video_url DESC NULLS LAST')))
         for i in time_records:
             if i.player not in players:
                 time_records_dedup.append(i)
