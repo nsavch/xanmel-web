@@ -8,6 +8,7 @@
             <div class="pull-right" style="margin-top: 20px;">Hello, {{ user.username }}! <a href="{{ url('logout') }}">Log OUT</a></div>
         </div>
         <div class="col-md-12">
+            <a href="{{ url('sorm:identity-list') }}">Back to SORM index</a>
             <p>This searches through: crypto_idfp, nickname with colors, nickname without colors, xonstats id, ip address</p>
             <form>
                 <input type="text" name="query" value="{{ query }}">
