@@ -123,3 +123,23 @@ def search_key(request, crypto_idfp):
         'identity': identity,
         'identities': identities
     })
+
+
+@permission_required('can_access_sorm')
+def advanced_search(request):
+    query = request.GET.get('query', '')
+    if query:
+        like_query = '%{}%'.format(query)
+        raw_identities = PlayerIdentification.select().where(
+            (PlayerIdentification.crypto_idfp ** like_query) |
+            (PlayerIdentification.stats_id == query) |
+            (PlayerIdentification.raw_nickname ** like_query) |
+            (PlayerIdentification.nickname ** like_query) |
+            (PlayerIdentification.ip_address == query)
+        )
+        identities = IdentityList()
+        for i in raw_identities:
+            identities.add_identity(i)
+    else:
+        identities = None
+    return render(request, 'sorm/advanced_search.jinja', {'identities': identities, 'query': query})

@@ -1,0 +1,46 @@
+{% extends "base.jinja" %}
+
+{% block container %}
+    <div class="row">
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-6">
+            <div class="pull-right" style="margin-top: 20px;">Hello, {{ user.username }}! <a href="{{ url('logout') }}">Log OUT</a></div>
+        </div>
+        <div class="col-md-12">
+            <p>This searches through: crypto_idfp, nickname with colors, nickname without colors, xonstats id, ip address</p>
+            <form>
+                <input type="text" name="query" value="{{ query }}">
+                <button class="btn btn-primary">Search</button>
+            </form>
+            {% if identities %}
+            <h3>Search results</h3>
+
+            <table class="table table-bordered">
+                <tr>
+                    <th>Nickname</th>
+                    <th>Geoloc</th>
+                    <th>Network name</th>
+                    <th><abbr title="Games played">GP</abbr></th>
+                </tr>
+                {% for key, value in identities %}
+                    <tr>
+                        <td>
+                            <a href="{{ url('sorm:identity-details', value['id']) }}">{{ value['nickname'] }}</a>
+                        </td>
+                        <td>
+                            {{ key.full_geoloc() }}
+                        </td>
+                        <td>
+                            {{ key.get('network_name') }}
+                        </td>
+                        <td>{{ value.timestamps|length }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            {% endif %}
+        </div>
+
+    </div>
+
+{% endblock %}
