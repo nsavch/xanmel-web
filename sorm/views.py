@@ -130,13 +130,16 @@ def advanced_search(request):
     query = request.GET.get('query', '')
     if query:
         like_query = '%{}%'.format(query)
-        raw_identities = PlayerIdentification.select().where(
-            (PlayerIdentification.crypto_idfp ** like_query) |
-            (PlayerIdentification.stats_id == query) |
-            (PlayerIdentification.raw_nickname ** like_query) |
-            (PlayerIdentification.nickname ** like_query) |
-            (PlayerIdentification.ip_address == query)
-        )
+        q = ((PlayerIdentification.crypto_idfp ** like_query) |
+             (PlayerIdentification.raw_nickname ** like_query) |
+             (PlayerIdentification.nickname ** like_query) |
+             (PlayerIdentification.ip_address == query))
+        try:
+            iquery = int(query)
+            q |= (PlayerIdentification.stats_id == iquery)
+        except (ValueError, TypeError):
+            pass
+        raw_identities = PlayerIdentification.select().where(q)
         identities = IdentityList()
         for i in raw_identities:
             identities.add_identity(i)
