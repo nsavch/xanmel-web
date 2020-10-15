@@ -1,0 +1,22 @@
+################################################################################
+# This requirements file has been automatically generated from `Pipfile` with
+# `pipenv-to-requirements`
+#
+#
+# This has been done to maintain backward compatibility with tools and services
+# that do not support `Pipfile` yet.
+#
+# Do NOT edit it directly, use `pipenv install [-d]` to modify `Pipfile` and
+# `Pipfile.lock` and then regenerate `requirements*.txt`.
+################################################################################
+
+asn1crypto==0.24.0
+bcrypt==3.1.4
+cryptography==2.2.2
+fabric3==1.14.post1
+idna==2.6
+paramiko==2.4.1
+pyasn1==0.4.2
+pycparser==2.18
+pynacl==1.2.1
+six==1.11.0

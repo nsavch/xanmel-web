@@ -1,0 +1,74 @@
+################################################################################
+# This requirements file has been automatically generated from `Pipfile` with
+# `pipenv-to-requirements`
+#
+#
+# This has been done to maintain backward compatibility with tools and services
+# that do not support `Pipfile` yet.
+#
+# Do NOT edit it directly, use `pipenv install [-d]` to modify `Pipfile` and
+# `Pipfile.lock` and then regenerate `requirements*.txt`.
+################################################################################
+
+aiodns==1.1.1
+aiohttp==3.2.1
+aiopg==0.14.0
+appdirs==1.4.3
+appnope==0.1.0
+async-timeout==3.0.0
+attrs==18.1.0
+backcall==0.1.0
+bottom==2.1.3
+cchardet==2.1.1
+certifi==2018.4.16
+chardet==3.0.4
+click==6.7
+dateparser==0.7.0
+decorator==4.3.0
+django-bootstrap4==0.0.6
+django-bower==5.2.0
+django-echoices==2.5.1
+django-jinja==2.4.1
+django==2.0.5
+djangorestframework==3.8.2
+geoip2==2.8.0
+humanize==0.5.1
+idna==2.6
+ipython-genutils==0.2.0
+ipython==6.4.0
+jedi==0.12.0
+jinja2==2.10
+markupsafe==1.0
+maxminddb==1.3.0
+maya==0.4.3
+multidict==4.3.1
+parso==0.2.0
+peewee-async==0.5.12
+peewee==2.10.2
+pendulum==1.5.1
+pexpect==4.5.0
+pickleshare==0.7.4
+prompt-toolkit==1.0.15
+psycopg2==2.8.6
+ptyprocess==0.5.2
+pycares==2.3.0
+pygments==2.2.0
+pyparsing==2.2.0
+python-dateutil==2.7.3
+python-xonotic-db==0.3.0
+pytz==2018.4
+pytzdata==2018.5
+pyyaml==5.3.1
+raven==6.8.0
+regex==2018.2.21
+requests==2.18.4
+simplegeneric==0.8.1
+six==1.11.0
+snaptime==0.2.4
+traitlets==4.3.2
+tzlocal==1.5.1
+urllib3==1.22
+uwsgi==2.0.19.1
+wcwidth==0.1.7
+yarl==1.2.4
+setuptools==45.3.0

@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.shortcuts import render
 from peewee import DoesNotExist
 
-from xanmel.modules.xonotic.models import PlayerIdentification, Server
+from xanmel.modules.xonotic.models import PlayerIdentification, Server, CTSRecord, Map
 
 
 class IdentityList:
@@ -146,3 +146,9 @@ def advanced_search(request):
     else:
         identities = None
     return render(request, 'sorm/advanced_search.jinja', {'identities': identities, 'query': query})
+
+
+@permission_required('can_access_sorm')
+def dump_cts_records(request):
+    records = CTSRecord.select().join(Server).join(Map).order_by(CTSRecord.timestamp.asc())
+    return render(request, 'sorm/cts_records.jinja', {'records': records})

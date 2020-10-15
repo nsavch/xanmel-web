@@ -1,0 +1,38 @@
+{% extends "base.jinja" %}
+
+{% block container %}
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-bordered table-striped">
+            <tr>
+                <th>
+                    Server
+                </th>
+                <th>
+                    Nickname
+                </th>
+                <th>
+                    Timestamp
+                </th>
+                <th>
+                    Map
+                </th>
+                <th>
+                    IP
+                </th>
+                <th>
+                    Crypto IDFP
+                </th>
+                <th>
+                    Stats ID
+                </th>
+            </tr>
+            {% for i in records %}
+            <tr>
+
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock %}
