@@ -72,3 +72,4 @@ uwsgi==2.0.19.1
 wcwidth==0.1.7
 yarl==1.2.4
 setuptools==45.3.0
+django-dotenv==1.4.2
