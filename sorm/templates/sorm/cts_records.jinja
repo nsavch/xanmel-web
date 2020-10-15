@@ -12,10 +12,13 @@
                     Nickname
                 </th>
                 <th>
-                    Timestamp
+                    time
                 </th>
                 <th>
                     Map
+                </th>
+                <th>
+                    Timestamp
                 </th>
                 <th>
                     IP
@@ -36,10 +39,13 @@
                     {{ html_colors(i.nickname_nocolors)|safe }}
                 </td>
                 <td>
-                    {{ i.timestamp }}
+                    {{ i.time }}
                 </td>
                 <td>
                     {{ i.map.name }}
+                </td>
+                <td>
+                    {{ i.timestamp }}
                 </td>
                 <td>
                     {{ i.ip_address }}
