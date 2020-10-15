@@ -29,7 +29,27 @@
             </tr>
             {% for i in records %}
             <tr>
-
+                <td>
+                    {{ i.server.name }}
+                </td>
+                <td>
+                    {{ i.nickname_nocolors }}
+                </td>
+                <td>
+                    {{ i.timestamp }}
+                </td>
+                <td>
+                    {{ i.map.name }}
+                </td>
+                <td>
+                    {{ i.ip_address }}
+                </td>
+                <td>
+                    {{ i.crypto_idfp }}
+                </td>
+                <td>
+                    {{ i.stats_id }}
+                </td>
             </tr>
             {% endfor %}
         </table>
