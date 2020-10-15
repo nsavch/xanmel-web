@@ -17,8 +17,10 @@ import yaml
 from distutils.util import strtobool
 import dotenv
 
-dotenv.read_dotenv()
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+print(BASE_DIR)
+dotenv.read_dotenv(os.path.join(os.path.dirname(BASE_DIR), '.env'))
 
 DEV = strtobool(os.environ.get('DEV', '0'))
 TESTING = strtobool(os.environ.get('TESTING', '0'))
