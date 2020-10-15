@@ -1,61 +1,65 @@
 {% extends "base.jinja" %}
 
-{% block container %}
-<div class="row" style="background-color: #222222; color: #eeeeee">
-    <div class="col-md-12">
-        <table class="table table-bordered">
-            <tr>
-                <th>
-                    Server
-                </th>
-                <th>
-                    Nickname
-                </th>
-                <th>
-                    time
-                </th>
-                <th>
-                    Map
-                </th>
-                <th>
-                    Timestamp
-                </th>
-                <th>
-                    IP
-                </th>
-                <th>
-                    Crypto IDFP
-                </th>
-            </tr>
-            {% for i in records %}
-            <tr>
-                <td>
-                    {{ i.server.name }}
-                </td>
-                <td>
-                    {{ html_colors(i.nickname)|safe }}
-                </td>
-                <td>
-                    {{ "{:.2f}".format(i.time) }}
-                </td>.
-                <td>
-                    {{ i.map.name }}
-                </td>
-                <td>
-                    {{ i.timestamp }}
-                </td>
-                <td>
-                    <a href="/sorm/search/?query={{ i.ip_address }}">
-                        {{ i.ip_address }}
-                    </a>
-                </td>
-                <td>
-                    <a href="/sorm/search/?query={{ i.crypto_idfp }}"
-                    {{ i.crypto_idfp }}
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
+{% block body %}
+<div class="container-fluid">
+    <div class="row" style="background-color: #222222; color: #eeeeee">
+        <div class="col-md-12">
+            <table class="table table-bordered">
+                <tr>
+                    <th>
+                        Server
+                    </th>
+                    <th>
+                        Nickname
+                    </th>
+                    <th>
+                        time
+                    </th>
+                    <th>
+                        Map
+                    </th>
+                    <th>
+                        Timestamp
+                    </th>
+                    <th>
+                        IP
+                    </th>
+                    <th>
+                        Crypto IDFP
+                    </th>
+                </tr>
+                {% for i in records %}
+                    <tr>
+                        <td>
+                            {{ i.server.name }}
+                        </td>
+                        <td>
+                            {{ html_colors(i.nickname)|safe }}
+                        </td>
+                        <td>
+                            {{ "{:.2f}".format(i.time) }}
+                        </td>
+                        .
+                        <td>
+                            {{ i.map.name }}
+                        </td>
+                        <td>
+                            {{ i.timestamp }}
+                        </td>
+                        <td>
+                            <a href="/sorm/search/?query={{ i.ip_address }}">
+                                {{ i.ip_address }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="/sorm/search/?query={{ i.crypto_idfp }}">
+                                {{ i.crypto_idfp }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}
