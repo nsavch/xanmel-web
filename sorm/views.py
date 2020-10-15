@@ -158,7 +158,7 @@ def dump_cts_records(request):
     ).switch(CTSRecord).join(
         Map,
         JOIN.INNER,
-    ).order_by(CTSRecord.timestamp.asc())
+    ).order_by(CTSRecord.timestamp.desc())
     return render(request, 'sorm/cts_records.jinja', {
         'records': records,
         'html_colors': html_colors
