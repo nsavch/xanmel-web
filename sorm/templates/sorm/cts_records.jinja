@@ -39,8 +39,8 @@
                     {{ html_colors(i.nickname_nocolors)|safe }}
                 </td>
                 <td>
-                    {{ i.time }}
-                </td>
+                    {{ "{:.2f}".format(i.time) }}
+                </td>.
                 <td>
                     {{ i.map.name }}
                 </td>
