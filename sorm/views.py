@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.shortcuts import render
 from peewee import DoesNotExist, JOIN
 
-from xanmel.modules.xonotic.models import PlayerIdentification, Server, CTSRecord, Map
+from xanmel.modules.xonotic.models import PlayerIdentification, Server, CTSRecord, Map, AnonCTSRecord
 
 from sorm.util import html_colors
 
@@ -162,4 +162,15 @@ def dump_cts_records(request):
     return render(request, 'sorm/cts_records.jinja', {
         'records': records,
         'html_colors': html_colors
+    })
+
+
+@permission_required('cann_access_sorm')
+def dump_anon_cts_records(request):
+    records = AnonCTSRecord.select().join(
+        Server,
+    ).order_by(AnonCTSRecord.timestamp.desc())
+    return render(request, 'sorm/anon_cts_records.jinja', {
+        'records': records,
+        'html_colors': html_colors,
     })

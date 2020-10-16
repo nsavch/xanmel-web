@@ -16,16 +16,7 @@
                         time
                     </th>
                     <th>
-                        Map
-                    </th>
-                    <th>
                         Timestamp
-                    </th>
-                    <th>
-                        IP
-                    </th>
-                    <th>
-                        Crypto IDFP
                     </th>
                 </tr>
                 {% for i in records %}
@@ -37,23 +28,10 @@
                             {{ html_colors(i.nickname)|safe }}
                         </td>
                         <td>
-                            {{ "{:.2f}".format(i.time) }}
-                        </td>
-                        <td>
-                            {{ i.map.name }}
+                            {{ i.time }}
                         </td>
                         <td>
                             {{ i.timestamp }}
-                        </td>
-                        <td>
-                            <a href="/sorm/search/?query={{ i.ip_address }}">
-                                {{ i.ip_address }}
-                            </a>
-                        </td>
-                        <td>
-                            <a href="/sorm/search/?query={{ i.crypto_idfp }}">
-                                {{ i.crypto_idfp }}
-                            </a>
                         </td>
                     </tr>
                 {% endfor %}
