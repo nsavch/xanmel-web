@@ -25,7 +25,9 @@
                             {{ i.server.name }}
                         </td>
                         <td>
-                            {{ html_colors(i.nickname)|safe }}
+                            <a href="/sorm/search/?query={{ i.nickname_nocolors }}">
+                                {{ html_colors(i.nickname)|safe }}
+                            </a>
                         </td>
                         <td>
                             {{ i.time }}
