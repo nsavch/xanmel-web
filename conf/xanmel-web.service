@@ -3,15 +3,11 @@ Description=Xanmel-web UWSGI Server
 After=syslog.target
 
 [Service]
-ExecStart=/usr/local/bin/pipenv run uwsgi --ini ./conf/uwsgi.ini
+ExecStart=/home/xanmel/.virtualenvs/xanmel-web/bin/gunicorn
 User=xanmel
 Group=xanmel
 Restart=always
 WorkingDirectory=/home/xanmel/xanmel-web/
-KillSignal=SIGQUIT
-Type=notify
-StandardError=syslog
-NotifyAccess=all
 
 [Install]
 WantedBy=multi-user.target
